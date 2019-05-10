@@ -1,6 +1,7 @@
 package com.wrlus.seciot;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -21,6 +22,8 @@ import com.google.gson.Gson;
 import com.wrlus.seciot.hook.FridaServerAgent;
 import com.wrlus.seciot.model.FridaVersionResponse;
 import com.wrlus.seciot.msg.Msg;
+import com.wrlus.seciot.net.TCPForwardService;
+import com.wrlus.seciot.util.DeviceHelper;
 
 import java.io.IOException;
 
@@ -35,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private TextView textViewFridaVersion;
     private Button btnFridaManage;
     private CheckBox checkBoxAPICheck, checkBoxConnection, checkBoxDataTransfer, checkBoxFileIO, checkBoxDB;
-    private String fridaVersion = "未知";
+    private String abi = "Unknown";
+    private String fridaVersion = "Unknown";
 
     static {
         System.loadLibrary("seciot_agent");
@@ -47,8 +51,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         setContentView(R.layout.activity_main);
         this.bindWidget();
         this.bindWidgetEvent();
+        this.getProductCpuAbi();
         try {
-            boolean rootStatus = FridaServerAgent.requestRootPermission("whoami");
+            boolean rootStatus = DeviceHelper.requestRootPermission("whoami");
             Toast.makeText(this, "ROOT状态："+rootStatus, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         btnFridaManage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] manageFridaAction = { "安装"+textViewFridaVersion.getText(), "卸载"+textViewFridaVersion.getText() };
+                String[] manageFridaAction = { "安装 "+textViewFridaVersion.getText(), "卸载 "+textViewFridaVersion.getText() };
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("管理 Frida 模块");
                 dialog.setItems(manageFridaAction, new DialogInterface.OnClickListener() {
@@ -103,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                installFrida(fridaVersion);
+                                installFrida(fridaVersion, abi);
                                 break;
                             case 1:
                                 uninstallFrida(fridaVersion);
@@ -124,16 +129,33 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             case Msg.GET_FRIDA_VERSION_SUCCESS:
                 fridaVersion = (String) msg.obj;
                 Log.i("FridaVersion", fridaVersion);
-                textViewFridaVersion.setText("Frida 版本 "+fridaVersion);
+                textViewFridaVersion.setText("Frida Version "+fridaVersion+"-"+abi);
                 break;
             case Msg.GET_FRIDA_VERSION_FAILED:
-                textViewFridaVersion.setText("Frida 版本 "+fridaVersion);
+                textViewFridaVersion.setText("Frida Version "+fridaVersion+"-"+abi);
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 Log.e("MessafeHandler", "Unknown message what = "+msg.what);
         }
         return true;
+    }
+
+    public void getProductCpuAbi() {
+        String abi = DeviceHelper.getProductCpuAbi();
+        if (abi == null) {
+            Toast.makeText(this, "Get product cpu abi failed", Toast.LENGTH_SHORT).show();
+        } else if (abi.contains("arm64")) {
+            this.abi = "arm64";
+        } else if (abi.contains("arm")) {
+            this.abi = "arm";
+        } else if (abi.contains("x86_64")) {
+            this.abi = "x86_64";
+        } else if (abi.contains("x86")) {
+            this.abi = "x86";
+        } else {
+            Toast.makeText(this, "Unknown product cpu abi: "+abi, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void getFridaVersionOnServer() {
@@ -165,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         });
     }
 
-    public void installFrida(String version) {
+    public void installFrida(String version, String abi) {
 
     }
 
