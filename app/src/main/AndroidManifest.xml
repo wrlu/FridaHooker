@@ -22,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".daemon.FridaServerService" />
+        <service android:name=".daemon.FrpcService" />
         <service android:name=".net.TCPForwardService" />
     </application>
 
