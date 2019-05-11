@@ -1,6 +1,6 @@
 package com.wrlus.seciot.model;
 
-public class FridaVersionResponse extends BaseResponse {
+public class VersionResponse extends BaseResponse {
     private String version;
 
     public String getVersion() {

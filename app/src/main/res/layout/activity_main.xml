@@ -50,10 +50,10 @@
     <TextView
         android:id="@+id/textViewFridaVersion"
         android:layout_width="0dp"
-        android:layout_height="19dp"
+        android:layout_height="20dp"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="25dp"
-        android:text="Frida Version 0.0.0-arm64"
+        android:layout_marginTop="24dp"
+        android:text="frida server 0.0.0-arm64"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@+id/btnFridaManage"
@@ -132,7 +132,31 @@
         android:text="从服务器端获取设置"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnFrpcManage" />
+
+    <TextView
+        android:id="@+id/textViewFrpVersion"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:text="frp client 0.0.0-arm64"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/btnFrpcManage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFridaVersion" />
+
+    <Button
+        android:id="@+id/btnFrpcManage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="30dp"
+        android:text="管理模块"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnFridaManage" />
 
 </android.support.constraint.ConstraintLayout>
