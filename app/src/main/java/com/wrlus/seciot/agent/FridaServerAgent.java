@@ -34,7 +34,6 @@ public class FridaServerAgent {
     public static void installFridaServer(final File downloadFile, final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         final String[] cmds = {
-                "whoami",
                 "mkdir /data/local/tmp/seciot/",
                 "mkdir /data/local/tmp/seciot/frida/",
                 "mkdir " + targetPath,
@@ -104,7 +103,6 @@ public class FridaServerAgent {
     public static void removeFridaServer(final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         final String[] cmds = {
-                "whoami",
                 "rm -rf " + targetPath
         };
         Thread thread = new Thread(new Runnable() {
@@ -129,7 +127,7 @@ public class FridaServerAgent {
                     }
                     String line;
                     while ((line = bs.readLine()) != null) {
-                        Log.i("InstallFridaServer", line);
+                        Log.i("RemoveFridaServer", line);
                     }
                     callback.onSuccess();
                 } catch (Exception e) {

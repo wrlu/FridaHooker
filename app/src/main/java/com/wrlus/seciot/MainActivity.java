@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Log.i("FrpVerion", frpVersion);
                 textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
                 this.setProgress(R.id.progressBarFrpInstall, 0);
+                this.checkFrpcInstallation(frpVersion);
                 break;
             case Msg.GET_FRP_VERSION_FAILED:
                 textViewFrpVersion.setText("frp client 不可用");
@@ -231,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.DOWNLOAD_FRP_SUCCESS:
-                this.setProgress(R.id.progressBarFrpInstall, 0.5);
+                this.setProgress(R.id.progressBarFrpInstall, 0.33);
                 this.installFrpc( (File) msg.obj, frpVersion);
                 break;
             case Msg.DOWNLOAD_FRP_FAILED:
@@ -330,10 +331,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    public void checkFrpcInstallation(String version) {
-
-    }
-
     public void downloadFridaServer(String version, final String abi) {
         FridaServerAgent.downloadFridaServer(version, abi, new Callback() {
             @Override
@@ -428,6 +425,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
+    public void checkFrpcInstallation(String version) {
+        if (FrpcAgent.checkFrpcInstallation(version)) {
+            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 就绪");
+            this.setProgress(R.id.progressBarFrpInstall, 1);
+            isFrpcInstalled = true;
+        } else {
+            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
+            this.setProgress(R.id.progressBarFrpInstall, 0);
+            isFrpcInstalled = false;
+        }
+    }
+
     public void downloadFrpc(String version, final String abi) {
         FrpcAgent.downloadFrp(version, abi, new Callback() {
             @Override
@@ -441,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 if (response.isSuccessful()) {
                     InputStream is = response.body().byteStream();
                     File dlFile = new File(MainActivity.this.getCacheDir().getAbsolutePath()
-                            + "/frp_"+fridaVersion+"_linux_"+abi+".tar.gz");
+                            + "/frp_"+frpVersion+"_linux_"+abi+".tar.gz");
                     FileOutputStream fos = new FileOutputStream(dlFile);
                     int len;
                     byte[] buffer = new byte[4096];
@@ -469,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFrpcInstallation(fridaVersion);
+                        MainActivity.this.checkFrpcInstallation(frpVersion);
                         MainActivity.this.setProgress(R.id.progressBarFrpInstall, 1);
                         Toast.makeText(MainActivity.this, "frp client 安装成功", Toast.LENGTH_SHORT).show();
                     }
@@ -489,6 +498,36 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         Toast.makeText(MainActivity.this, "frp client 安装失败", Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        });
+    }
+
+    public void bindRemotePort(String clientId) {
+        FrpcAgent.bindRemotePort(clientId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Message msg = handler.obtainMessage(Msg.BIND_REMOTE_PORT_FAILED, e);
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+        });
+    }
+
+    public void unBindRemotePort(String clientId) {
+        FrpcAgent.unBindRemotePort(clientId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Message msg = handler.obtainMessage(Msg.UNBIND_REMOTE_PORT_FAILED, e);
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
             }
         });
     }
