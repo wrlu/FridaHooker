@@ -8,7 +8,7 @@ import okhttp3.Request;
 
 public class FrpcAgent {
     private static final String AGENT_SERVER = "http://10.5.26.179:8080/SecIoT";
-    private static final String FRP_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frp/${version}/";
+    private static final String FRP_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frp/v${version}/";
     private static final String FRP_NAME = "frp_${version}_linux_${abi}.tar.gz";
 
     public static void getFrpsVersionOnServer(Callback callback) {
@@ -26,7 +26,7 @@ public class FrpcAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void installFrpc(File downloadFile, String version) {
+    public static void installFrpc(final File downloadFile, final String version, final StatusCallback callback) {
 
     }
 
@@ -34,7 +34,7 @@ public class FrpcAgent {
 
     }
 
-    public static void removeFrpc(String version) {
+    public static void removeFrpc(final String version, final StatusCallback callback) {
 
     }
 

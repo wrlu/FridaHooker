@@ -31,15 +31,19 @@ public class FridaServerAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void installFridaServer(final File downloadFile, final String version) {
+    public static void installFridaServer(final File downloadFile, final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         final String[] cmds = {
                 "whoami",
                 "mkdir /data/local/tmp/seciot/",
                 "mkdir /data/local/tmp/seciot/frida/",
                 "mkdir " + targetPath,
-                "cp " + downloadFile.getAbsolutePath() + " " + targetPath,
-                "chmod +x "
+                "mv " + downloadFile.getAbsolutePath() + " " + targetPath,
+                "cd " + targetPath,
+                "tar -zxvf " + downloadFile.getName(),
+                "rm " + downloadFile.getName(),
+                "mv " + downloadFile.getName().replace(".tar.gz", "") + " frida-server",
+                "chmod +x frida-server"
         };
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -51,20 +55,23 @@ public class FridaServerAgent {
                     BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     DataOutputStream os = new DataOutputStream(process.getOutputStream());
                     for (String cmd : cmds) {
+                        Log.d("ExecCmd", cmd);
                         os.writeBytes( cmd + "\n");
                     }
                     os.writeBytes("exit\n");
                     os.flush();
                     process.waitFor();
                     if (process.exitValue() != 0) {
-
+                        callback.onFailure(process.exitValue(), null);
+                        return;
                     }
                     String line;
                     while ((line = bs.readLine()) != null) {
-                        Log.i("RootCheck", line);
+                        Log.i("InstallFridaServer", line);
                     }
+                    callback.onSuccess();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    callback.onFailure(-1, e);
                 }
             }
         });
@@ -72,8 +79,67 @@ public class FridaServerAgent {
         thread.start();
     }
 
-    public static void removeFridaServer(String version) {
+    public static boolean checkFridaServerInstallation(String version) {
+        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("ls", targetPath + "frida-server");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            process.waitFor();
+            String line;
+            while ((line = bs.readLine()) != null) {
+                Log.i("FridaCheck", line);
+            }
+            if (process.exitValue() == 0) {
+                return true;
+            }
+            Log.e("FridaCheck", String.valueOf(process.exitValue()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
+    public static void removeFridaServer(final String version, final StatusCallback callback) {
+        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
+        final String[] cmds = {
+                "whoami",
+                "rm -rf " + targetPath
+        };
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ProcessBuilder processBuilder = new ProcessBuilder("su");
+                    processBuilder.redirectErrorStream(true);
+                    Process process = processBuilder.start();
+                    BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    DataOutputStream os = new DataOutputStream(process.getOutputStream());
+                    for (String cmd : cmds) {
+                        Log.d("ExecCmd", cmd);
+                        os.writeBytes( cmd + "\n");
+                    }
+                    os.writeBytes("exit\n");
+                    os.flush();
+                    process.waitFor();
+                    if (process.exitValue() != 0) {
+                        callback.onFailure(process.exitValue(), null);
+                        return;
+                    }
+                    String line;
+                    while ((line = bs.readLine()) != null) {
+                        Log.i("InstallFridaServer", line);
+                    }
+                    callback.onSuccess();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onFailure(-1, e);
+                }
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public static void startFridaServer(String version) {

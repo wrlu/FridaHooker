@@ -1,7 +1,6 @@
 package com.wrlus.seciot;
 
 import android.content.DialogInterface;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -25,6 +24,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.wrlus.seciot.agent.FridaServerAgent;
 import com.wrlus.seciot.agent.FrpcAgent;
+import com.wrlus.seciot.agent.StatusCallback;
 import com.wrlus.seciot.model.VersionResponse;
 import com.wrlus.seciot.msg.Msg;
 import com.wrlus.seciot.util.DeviceHelper;
@@ -33,6 +33,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private CheckBox checkBoxAPICheck, checkBoxConnection, checkBoxDataTransfer, checkBoxFileIO, checkBoxDB;
     private String abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
+    private boolean isFridaServerInstalled = false, isFrpcInstalled = false;
 
     static {
         System.loadLibrary("seciot_agent");
@@ -132,13 +135,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void onClick(View v) {
                 if (fridaVersion.equals("Unknown")) {
-                    Toast.makeText(MainActivity.this, "frida版本未知，不能执行此操作，请刷新后重试。", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "frida版本未知，请刷新后重试。", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String[] manageFridaAction = { "安装 "+textViewFridaVersion.getText(), "卸载 "+textViewFridaVersion.getText() };
+                List<String> manageFridaAction = new ArrayList<>();
+                manageFridaAction.add("安装 frida server "+fridaVersion+"-"+abi);
+                if (isFridaServerInstalled) {
+                    manageFridaAction.add("卸载 frida server "+fridaVersion+"-"+abi);
+                }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("管理 frida server");
-                dialog.setItems(manageFridaAction, new DialogInterface.OnClickListener() {
+                dialog.setItems(manageFridaAction.toArray(new String[0]), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -159,14 +166,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         btnFrpcManage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (fridaVersion.equals("Unknown")) {
-                    Toast.makeText(MainActivity.this, "frp版本未知，不能执行此操作，请刷新后重试。", Toast.LENGTH_SHORT).show();
+                if (frpVersion.equals("Unknown")) {
+                    Toast.makeText(MainActivity.this, "frp版本未知，请刷新后重试。", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String[] manageFridaAction = { "安装 "+textViewFrpVersion.getText(), "卸载 "+textViewFrpVersion.getText() };
+                List<String> manageFridaAction = new ArrayList<>();
+                manageFridaAction.add("安装 frp client "+frpVersion+"-"+abi);
+                if (isFrpcInstalled) {
+                    manageFridaAction.add("卸载 frp client "+frpVersion+"-"+abi);
+                }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("管理 frp client");
-                dialog.setItems(manageFridaAction, new DialogInterface.OnClickListener() {
+                dialog.setItems(manageFridaAction.toArray(new String[0]), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -192,30 +203,35 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             case Msg.GET_FRIDA_VERSION_SUCCESS:
                 fridaVersion = (String) msg.obj;
                 Log.i("FridaVersion", fridaVersion);
-                textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi);
+                textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
+                this.setProgress(R.id.progressBarFridaInstall, 0);
+                this.checkFridaInstallation(fridaVersion);
                 break;
             case Msg.GET_FRIDA_VERSION_FAILED:
-                textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi);
+                textViewFridaVersion.setText("frida server 不可用");
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
+                this.setProgress(R.id.progressBarFridaInstall, 0);
                 break;
             case Msg.GET_FRP_VERSION_SUCCESS:
-                fridaVersion = (String) msg.obj;
+                frpVersion = (String) msg.obj;
                 Log.i("FrpVerion", frpVersion);
-                textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi);
+                textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
+                this.setProgress(R.id.progressBarFrpInstall, 0);
                 break;
             case Msg.GET_FRP_VERSION_FAILED:
-                textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi);
+                textViewFrpVersion.setText("frp client 不可用");
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
+                this.setProgress(R.id.progressBarFrpInstall, 0);
                 break;
             case Msg.DOWNLOAD_FRIDA_SUCCESS:
-                this.setProgress(R.id.progressBarFridaInstall, 0.25);
+                this.setProgress(R.id.progressBarFridaInstall, 0.5);
                 this.installFrida( (File) msg.obj, fridaVersion);
                 break;
             case Msg.DOWNLOAD_FRIDA_FAILED:
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.DOWNLOAD_FRP_SUCCESS:
-                this.setProgress(R.id.progressBarFrpInstall, 0.25);
+                this.setProgress(R.id.progressBarFrpInstall, 0.5);
                 this.installFrpc( (File) msg.obj, frpVersion);
                 break;
             case Msg.DOWNLOAD_FRP_FAILED:
@@ -302,6 +318,22 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
+    public void checkFridaInstallation(String version) {
+        if (FridaServerAgent.checkFridaServerInstallation(version)) {
+            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 就绪");
+            this.setProgress(R.id.progressBarFridaInstall, 1);
+            isFridaServerInstalled = true;
+        } else {
+            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
+            this.setProgress(R.id.progressBarFridaInstall, 0);
+            isFridaServerInstalled = false;
+        }
+    }
+
+    public void checkFrpcInstallation(String version) {
+
+    }
+
     public void downloadFridaServer(String version, final String abi) {
         FridaServerAgent.downloadFridaServer(version, abi, new Callback() {
             @Override
@@ -314,8 +346,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     InputStream is = response.body().byteStream();
-                    File dlFile = new File(Environment.getDownloadCacheDirectory().getAbsolutePath()
-                            + "/frida-server-"+fridaVersion+"-android-"+abi+".xz");
+                    File dlFile = new File(MainActivity.this.getCacheDir().getAbsolutePath()
+                            + "/frida-server-"+fridaVersion+"-android-"+abi+".tar.gz");
                     FileOutputStream fos = new FileOutputStream(dlFile);
                     int len;
                     byte[] buffer = new byte[4096];
@@ -336,11 +368,64 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void installFrida(File downloadFile, String version) {
-        FridaServerAgent.installFridaServer(downloadFile, version);
+        FridaServerAgent.installFridaServer(downloadFile, version, new StatusCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.setProgress(R.id.progressBarFridaInstall, 1);
+                        MainActivity.this.checkFridaInstallation(fridaVersion);
+                        Toast.makeText(MainActivity.this, "frida server 安装成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int exitCode, Exception e) {
+                Log.e("InstallFridaServer", String.valueOf(exitCode));
+                if (e != null) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.setProgress(R.id.progressBarFridaInstall, 0);
+                        Toast.makeText(MainActivity.this, "frida server 安装失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     public void removeFrida(String version) {
-        FridaServerAgent.removeFridaServer(version);
+        FridaServerAgent.removeFridaServer(version, new StatusCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.checkFridaInstallation(fridaVersion);
+                        MainActivity.this.setProgress(R.id.progressBarFridaInstall, 0);
+                        Toast.makeText(MainActivity.this, "frida server 卸载成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int exitCode, Exception e) {
+                Log.e("RemoveFridaServer", String.valueOf(exitCode));
+                if (e != null) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "frida server 卸载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     public void downloadFrpc(String version, final String abi) {
@@ -355,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     InputStream is = response.body().byteStream();
-                    File dlFile = new File(Environment.getDownloadCacheDirectory().getAbsolutePath()
+                    File dlFile = new File(MainActivity.this.getCacheDir().getAbsolutePath()
                             + "/frp_"+fridaVersion+"_linux_"+abi+".tar.gz");
                     FileOutputStream fos = new FileOutputStream(dlFile);
                     int len;
@@ -378,11 +463,64 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void installFrpc(File downloadFile, String version) {
-        FrpcAgent.installFrpc(downloadFile, version);
+        FrpcAgent.installFrpc(downloadFile, version, new StatusCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.checkFrpcInstallation(fridaVersion);
+                        MainActivity.this.setProgress(R.id.progressBarFrpInstall, 1);
+                        Toast.makeText(MainActivity.this, "frp client 安装成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int exitCode, Exception e) {
+                Log.e("InstallFrpc", String.valueOf(exitCode));
+                if (e != null) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.setProgress(R.id.progressBarFrpInstall, 0);
+                        Toast.makeText(MainActivity.this, "frp client 安装失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     public void removeFrpc(String version) {
-        FrpcAgent.removeFrpc(version);
+        FrpcAgent.removeFrpc(version, new StatusCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.checkFrpcInstallation(fridaVersion);
+                        MainActivity.this.setProgress(R.id.progressBarFrpInstall, 0);
+                        Toast.makeText(MainActivity.this, "frp client 卸载成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int exitCode, Exception e) {
+                Log.e("RemoveFridaServer", String.valueOf(exitCode));
+                if (e != null) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "frp client 卸载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     @Override
