@@ -342,6 +342,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 就绪");
             this.setProgress(R.id.progressBarFridaInstall, 1);
             isFridaServerInstalled = true;
+            if (isFrpcInstalled) {
+                imageStatus.setImageResource(R.mipmap.status_success);
+            }
         } else {
             textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
             this.setProgress(R.id.progressBarFridaInstall, 0);
@@ -392,9 +395,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         MainActivity.this.setProgress(R.id.progressBarFridaInstall, 1);
                         MainActivity.this.checkFridaInstallation();
                         Toast.makeText(MainActivity.this, "frida server 安装成功", Toast.LENGTH_SHORT).show();
-                        if (isFridaServerInstalled && isFrpcInstalled) {
-                            imageStatus.setImageResource(R.mipmap.status_success);
-                        }
                     }
                 });
             }
@@ -455,6 +455,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 就绪");
             this.setProgress(R.id.progressBarFrpInstall, 1);
             isFrpcInstalled = true;
+            if (isFridaServerInstalled) {
+                imageStatus.setImageResource(R.mipmap.status_success);
+            }
         } else {
             textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
             this.setProgress(R.id.progressBarFrpInstall, 0);
@@ -506,9 +509,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         MainActivity.this.checkFrpcInstallation();
                         MainActivity.this.setProgress(R.id.progressBarFrpInstall, 1);
                         Toast.makeText(MainActivity.this, "frp client 安装成功", Toast.LENGTH_SHORT).show();
-                        if (isFridaServerInstalled && isFrpcInstalled) {
-                            imageStatus.setImageResource(R.mipmap.status_success);
-                        }
                     }
                 });
             }
