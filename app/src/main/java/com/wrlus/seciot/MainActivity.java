@@ -628,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void removeFrpc() {
-        FrpcAgent.removeFrpc(fridaVersion, new StatusCallback() {
+        FrpcAgent.removeFrpc(frpVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
