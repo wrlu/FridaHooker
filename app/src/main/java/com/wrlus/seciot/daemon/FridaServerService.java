@@ -13,10 +13,6 @@ public class FridaServerService extends Service {
 
     private FridaServerThread daemonThread;
 
-    static {
-        System.loadLibrary("seciot_agent");
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Cannot bind FridaServerService");
@@ -24,6 +20,9 @@ public class FridaServerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            return super.onStartCommand(null, flags, startId);
+        }
         String version = intent.getStringExtra("version");
         if (version == null) {
             Log.e("FridaServerService", "Missing parameter version: version is null.");
@@ -39,6 +38,26 @@ public class FridaServerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        String cmd = "kill -9 $(pidof frida-server)";
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("su");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            Log.d("ExecCmd", cmd);
+            os.writeBytes( cmd + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+            String line;
+            while ((line = bs.readLine()) != null) {
+                Log.i("FridaServerThread", line);
+            }
+            Log.e("FridaServerThread", "Kill process frida server exited with code "+process.exitValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         daemonThread.interrupt();
     }
 
@@ -68,6 +87,7 @@ public class FridaServerService extends Service {
                     Log.d("ExecCmd", cmd);
                     os.writeBytes( cmd + "\n");
                 }
+                os.writeBytes("exit\n");
                 os.flush();
                 process.waitFor();
                 String line;

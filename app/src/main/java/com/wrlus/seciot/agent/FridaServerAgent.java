@@ -93,12 +93,12 @@ public class FridaServerAgent {
             process.waitFor();
             String line;
             while ((line = bs.readLine()) != null) {
-                Log.i("FridaCheck", line);
+                Log.i("FridaInstallationCheck", line);
             }
             if (process.exitValue() == 0) {
                 return true;
             }
-            Log.e("FridaCheck", String.valueOf(process.exitValue()));
+            Log.e("FridaInstallationCheck", String.valueOf(process.exitValue()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,6 +149,27 @@ public class FridaServerAgent {
         Intent intent = new Intent(context, FridaServerService.class);
         intent.putExtra("version", version);
         context.startService(intent);
+    }
+
+    public static boolean checkFridaServerProcess() {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frida-server");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            process.waitFor();
+            String line;
+            while ((line = bs.readLine()) != null) {
+                Log.i("FridaProcessCheck", line);
+            }
+            if (process.exitValue() == 0) {
+                return true;
+            }
+            Log.e("FridaProcessCheck", String.valueOf(process.exitValue()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void stopFridaServer(Context context) {

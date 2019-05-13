@@ -3,8 +3,6 @@ package com.wrlus.seciot;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private Switch switchStatus;
     private ImageView imageStatus;
     private TextView textViewFridaVersion, textViewFrpVersion;
-    private Button btnFridaManage, btnFrpcManage, btnRefresh;
+    private Button btnFridaManage, btnFrpcManage;
     private String abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
     private boolean isFridaServerInstalled = false, isFrpcInstalled = false, isFridaServerStarted = false, isFrpcStarted = false;
@@ -62,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         this.bindWidget();
         this.bindWidgetEvent();
         this.getProductCpuAbi();
+        this.getFridaVersionOnServer();
+        this.getFrpsVersionOnServer();
     }
 
     @Override
@@ -75,8 +75,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.btnRefresh:
-                this.getFridaVersionOnServer();
-                this.getFrpsVersionOnServer();
+                checkAll();
                 break;
             default:
                 break;
@@ -87,8 +86,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     protected void onStart() {
         super.onStart();
-        this.getFridaVersionOnServer();
-        this.getFrpsVersionOnServer();
+        this.checkAll();
     }
 
     public void bindWidget() {
@@ -98,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         textViewFrpVersion = findViewById(R.id.textViewFrpVersion);
         btnFridaManage = findViewById(R.id.btnFridaManage);
         btnFrpcManage = findViewById(R.id.btnFrpcManage);
-        btnRefresh = new Button(this);
         imageStatus.setImageResource(R.mipmap.status_error);
     }
 
@@ -114,8 +111,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         startFrpc();
                     }
                 } else {
-//                    TODO: 实现服务的停止和清理
-                    switchStatus.setChecked(true);
+                    if (isFridaServerStarted) {
+                        stopFrida();
+                    }
+                    if (isFrpcStarted) {
+                        stopFrpc();
+                    }
                 }
             }
         });
@@ -185,6 +186,69 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
+    public void checkAll() {
+        this.checkFridaInstallation();
+        this.checkFridaProcess();
+        this.checkFrpcInstallation();
+        this.checkFrpcProcess();
+    }
+
+    public void checkFridaInstallation() {
+        if (FridaServerAgent.checkFridaServerInstallation(fridaVersion)) {
+            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 就绪");
+            setProgress(R.id.progressBarFridaInstall, 1);
+            isFridaServerInstalled = true;
+            if (isFrpcInstalled) {
+                imageStatus.setImageResource(R.mipmap.status_success);
+            }
+        } else {
+            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
+            setProgress(R.id.progressBarFridaInstall, 0);
+            isFridaServerInstalled = false;
+            imageStatus.setImageResource(R.mipmap.status_error);
+        }
+    }
+
+    public void checkFridaProcess() {
+        if (FridaServerAgent.checkFridaServerProcess()) {
+            isFridaServerStarted = true;
+            if (isFrpcStarted) {
+                switchStatus.setChecked(true);
+            }
+        } else {
+            isFridaServerStarted = false;
+            switchStatus.setChecked(false);
+        }
+    }
+
+    public void checkFrpcInstallation() {
+        if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
+            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 就绪");
+            this.setProgress(R.id.progressBarFrpInstall, 1);
+            isFrpcInstalled = true;
+            if (isFridaServerInstalled) {
+                imageStatus.setImageResource(R.mipmap.status_success);
+            }
+        } else {
+            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
+            this.setProgress(R.id.progressBarFrpInstall, 0);
+            isFrpcInstalled = false;
+            imageStatus.setImageResource(R.mipmap.status_error);
+        }
+    }
+
+    public void checkFrpcProcess() {
+        if (FrpcAgent.checkFrpcProcess()) {
+            isFrpcStarted = true;
+            if (isFridaServerStarted) {
+                switchStatus.setChecked(true);
+            }
+        } else {
+            isFrpcStarted = false;
+            switchStatus.setChecked(false);
+        }
+    }
+
     public String getClientId() {
         SharedPreferences sharedPref = getSharedPreferences("com.wrlus.seciot", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -203,9 +267,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             case Msg.GET_FRIDA_VERSION_SUCCESS:
                 fridaVersion = (String) msg.obj;
                 Log.i("FridaVersion", fridaVersion);
-                textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
-                this.setProgress(R.id.progressBarFridaInstall, 0);
-                this.checkFridaInstallation();
+                checkAll();
                 break;
             case Msg.GET_FRIDA_VERSION_FAILED:
                 textViewFridaVersion.setText("frida server 不可用");
@@ -215,45 +277,44 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             case Msg.GET_FRP_VERSION_SUCCESS:
                 frpVersion = (String) msg.obj;
                 Log.i("FrpVerion", frpVersion);
-                textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
-                this.setProgress(R.id.progressBarFrpInstall, 0);
-                this.checkFrpcInstallation();
+                checkAll();
                 break;
             case Msg.GET_FRP_VERSION_FAILED:
                 textViewFrpVersion.setText("frp client 不可用");
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
-                this.setProgress(R.id.progressBarFrpInstall, 0);
+                setProgress(R.id.progressBarFrpInstall, 0);
                 break;
             case Msg.DOWNLOAD_FRIDA_SUCCESS:
-                this.setProgress(R.id.progressBarFridaInstall, 0.5);
-                this.installFrida( (File) msg.obj);
+                setProgress(R.id.progressBarFridaInstall, 0.5);
+                installFrida( (File) msg.obj);
                 break;
             case Msg.DOWNLOAD_FRIDA_FAILED:
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.DOWNLOAD_FRP_SUCCESS:
-                this.setProgress(R.id.progressBarFrpInstall, 0.33);
-                this.installFrpc( (File) msg.obj);
+                setProgress(R.id.progressBarFrpInstall, 0.33);
+                installFrpc( (File) msg.obj);
                 break;
             case Msg.DOWNLOAD_FRP_FAILED:
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.BIND_REMOTE_PORT_SUCCESS:
-                this.realStartFrpc( (Integer) msg.obj);
+                realStartFrpc( (Integer) msg.obj);
                 break;
             case Msg.BIND_REMOTE_PORT_FAILED:
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.GET_REMOTE_PORT_SUCCESS:
-                this.realStartFrpc( (Integer) msg.obj);
+                realStartFrpc( (Integer) msg.obj);
                 break;
             case Msg.GET_REMOTE_PORT_FAILED:
-                this.bindRemotePort();
+                bindRemotePort();
                 break;
             case Msg.UNBIND_REMOTE_PORT_SUCCESS:
-//                TODO: Stop Frpc
+                realStopFrpc();
                 break;
             case Msg.UNBIND_REMOTE_PORT_FAILED:
+                realStopFrpc();
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -337,22 +398,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    public void checkFridaInstallation() {
-        if (FridaServerAgent.checkFridaServerInstallation(fridaVersion)) {
-            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 就绪");
-            this.setProgress(R.id.progressBarFridaInstall, 1);
-            isFridaServerInstalled = true;
-            if (isFrpcInstalled) {
-                imageStatus.setImageResource(R.mipmap.status_success);
-            }
-        } else {
-            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
-            this.setProgress(R.id.progressBarFridaInstall, 0);
-            isFridaServerInstalled = false;
-            imageStatus.setImageResource(R.mipmap.status_error);
-        }
-    }
-
     public void downloadFridaServer() {
         FridaServerAgent.downloadFridaServer(fridaVersion, abi, new Callback() {
             @Override
@@ -393,8 +438,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.setProgress(R.id.progressBarFridaInstall, 1);
-                        MainActivity.this.checkFridaInstallation();
+                        checkAll();
                         Toast.makeText(MainActivity.this, "frida server 安装成功", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -409,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.setProgress(R.id.progressBarFridaInstall, 0);
+                        setProgress(R.id.progressBarFridaInstall, 0);
                         Toast.makeText(MainActivity.this, "frida server 安装失败", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -419,6 +463,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     public void startFrida() {
         FridaServerAgent.startFridaServer(this, fridaVersion);
+        checkAll();
+    }
+
+    public void stopFrida() {
+        FridaServerAgent.stopFridaServer(this);
+        checkAll();
     }
 
     public void removeFrida() {
@@ -428,8 +478,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFridaInstallation();
-                        MainActivity.this.setProgress(R.id.progressBarFridaInstall, 0);
+                        checkAll();
                         Toast.makeText(MainActivity.this, "frida server 卸载成功", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -449,22 +498,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 });
             }
         });
-    }
-
-    public void checkFrpcInstallation() {
-        if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
-            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 就绪");
-            this.setProgress(R.id.progressBarFrpInstall, 1);
-            isFrpcInstalled = true;
-            if (isFridaServerInstalled) {
-                imageStatus.setImageResource(R.mipmap.status_success);
-            }
-        } else {
-            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
-            this.setProgress(R.id.progressBarFrpInstall, 0);
-            isFrpcInstalled = false;
-            imageStatus.setImageResource(R.mipmap.status_error);
-        }
     }
 
     public void downloadFrpc() {
@@ -508,8 +541,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFrpcInstallation();
-                        MainActivity.this.setProgress(R.id.progressBarFrpInstall, 1);
+                        checkAll();
+                        setProgress(R.id.progressBarFrpInstall, 1);
                         Toast.makeText(MainActivity.this, "frp client 安装成功", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -524,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.setProgress(R.id.progressBarFrpInstall, 0);
+                        setProgress(R.id.progressBarFrpInstall, 0);
                         Toast.makeText(MainActivity.this, "frp client 安装失败", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -534,6 +567,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     public void startFrpc() {
         getRemotePort();
+    }
+
+    public void stopFrpc() {
+        unBindRemotePort();
+    }
+
+    public void realStopFrpc() {
+        FrpcAgent.stopFrpc(this);
     }
 
     public void bindRemotePort() {
@@ -634,8 +675,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFrpcInstallation();
-                        MainActivity.this.setProgress(R.id.progressBarFrpInstall, 0);
+                        checkAll();
                         Toast.makeText(MainActivity.this, "frp client 卸载成功", Toast.LENGTH_SHORT).show();
                     }
                 });

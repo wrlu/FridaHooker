@@ -122,12 +122,12 @@ public class FrpcAgent {
             process.waitFor();
             String line;
             while ((line = bs.readLine()) != null) {
-                Log.i("FrpCheck", line);
+                Log.i("FrpcInstallationCheck", line);
             }
             if (process.exitValue() == 0) {
                 return true;
             }
-            Log.e("FrpCheck", String.valueOf(process.exitValue()));
+            Log.e("FrpcInstallationCheck", String.valueOf(process.exitValue()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -219,6 +219,27 @@ public class FrpcAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean checkFrpcProcess() {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frpc");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            process.waitFor();
+            String line;
+            while ((line = bs.readLine()) != null) {
+                Log.i("FrpcProcessCheck", line);
+            }
+            if (process.exitValue() == 0) {
+                return true;
+            }
+            Log.e("FrpcProcessCheck", String.valueOf(process.exitValue()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void stopFrpc(Context context) {

@@ -13,10 +13,6 @@ public class FrpcService extends Service {
 
     private FrpcThread daemonThread;
 
-    static {
-        System.loadLibrary("seciot_agent");
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Cannot bind FrpcService");
@@ -24,13 +20,16 @@ public class FrpcService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            return super.onStartCommand(null, flags, startId);
+        }
         String version = intent.getStringExtra("version");
         if (version == null) {
             Log.e("FrpcService", "Missing parameter version: version is null.");
             return super.onStartCommand(intent, flags, startId);
         }
         daemonThread = new FrpcThread(version);
-        daemonThread.setName("Thread-fridaserver");
+        daemonThread.setName("Thread-frpc");
         daemonThread.setDaemon(true);
         daemonThread.start();
         return super.onStartCommand(intent, flags, startId);
@@ -39,6 +38,26 @@ public class FrpcService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        String cmd = "kill -9 $(pidof frpc)";
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("su");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            Log.d("ExecCmd", cmd);
+            os.writeBytes( cmd + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+            String line;
+            while ((line = bs.readLine()) != null) {
+                Log.i("FrpcThread", line);
+            }
+            Log.e("FrpcThread", "Kill process frida server exited with code "+process.exitValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         daemonThread.interrupt();
     }
 
@@ -68,6 +87,7 @@ public class FrpcService extends Service {
                     Log.d("ExecCmd", cmd);
                     os.writeBytes( cmd + "\n");
                 }
+                os.writeBytes("exit\n");
                 os.flush();
                 process.waitFor();
                 String line;
