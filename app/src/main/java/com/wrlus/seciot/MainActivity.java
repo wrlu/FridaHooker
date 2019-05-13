@@ -349,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
             this.setProgress(R.id.progressBarFridaInstall, 0);
             isFridaServerInstalled = false;
+            imageStatus.setImageResource(R.mipmap.status_error);
         }
     }
 
@@ -462,6 +463,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
             this.setProgress(R.id.progressBarFrpInstall, 0);
             isFrpcInstalled = false;
+            imageStatus.setImageResource(R.mipmap.status_error);
         }
     }
 
