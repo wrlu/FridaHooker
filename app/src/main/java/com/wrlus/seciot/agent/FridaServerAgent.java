@@ -1,6 +1,10 @@
 package com.wrlus.seciot.agent;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+
+import com.wrlus.seciot.daemon.FridaServerService;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -12,7 +16,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class FridaServerAgent {
-    private static final String AGENT_SERVER = "http://10.5.26.179:8080/SecIoT";
+    private static final String AGENT_SERVER_HOST = "10.5.26.179";
+    private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
     private static final String FRIDA_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frida/${version}/";
     private static final String FRIDA_SERVER_NAME = "frida-server-${version}-android-${abi}.tar.gz";
 
@@ -60,13 +65,13 @@ public class FridaServerAgent {
                     os.writeBytes("exit\n");
                     os.flush();
                     process.waitFor();
-                    if (process.exitValue() != 0) {
-                        callback.onFailure(process.exitValue(), null);
-                        return;
-                    }
                     String line;
                     while ((line = bs.readLine()) != null) {
                         Log.i("InstallFridaServer", line);
+                    }
+                    if (process.exitValue() != 0) {
+                        callback.onFailure(process.exitValue(), null);
+                        return;
                     }
                     callback.onSuccess();
                 } catch (Exception e) {
@@ -121,13 +126,13 @@ public class FridaServerAgent {
                     os.writeBytes("exit\n");
                     os.flush();
                     process.waitFor();
-                    if (process.exitValue() != 0) {
-                        callback.onFailure(process.exitValue(), null);
-                        return;
-                    }
                     String line;
                     while ((line = bs.readLine()) != null) {
                         Log.i("RemoveFridaServer", line);
+                    }
+                    if (process.exitValue() != 0) {
+                        callback.onFailure(process.exitValue(), null);
+                        return;
                     }
                     callback.onSuccess();
                 } catch (Exception e) {
@@ -140,11 +145,14 @@ public class FridaServerAgent {
         thread.start();
     }
 
-    public static void startFridaServer(String version) {
-
+    public static void startFridaServer(Context context, String version) {
+        Intent intent = new Intent(context, FridaServerService.class);
+        intent.putExtra("version", version);
+        context.startService(intent);
     }
 
-    public static void stopFridaServer(String version) {
-
+    public static void stopFridaServer(Context context) {
+        Intent intent = new Intent(context, FridaServerService.class);
+        context.stopService(intent);
     }
 }

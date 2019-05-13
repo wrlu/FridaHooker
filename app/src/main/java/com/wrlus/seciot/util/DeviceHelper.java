@@ -18,14 +18,13 @@ public class DeviceHelper {
             os.writeBytes("exit\n");
             os.flush();
             process.waitFor();
-            if (process.exitValue() != 0) {
-                return false;
-            }
             String line;
             while ((line = bs.readLine()) != null) {
                 Log.i("RootCheck", line);
             }
-            return true;
+            if (process.exitValue() == 0) {
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -11,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class TCPForwardService extends Service {
-
+    private TCPForwardListenThread listenThread;
     private String remoteIp = "10.5.26.179";
     private int remotePort = 8042;
 
@@ -23,21 +23,26 @@ public class TCPForwardService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TCPForwardService.class.getSimpleName(), "Service started");
-        TCPForwardListenThread listenThread = new TCPForwardListenThread();
+        listenThread = new TCPForwardListenThread();
         listenThread.setName("Thread-TCPForwardListen");
         listenThread.setDaemon(true);
         listenThread.start();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    class TCPForwardListenThread extends Thread {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        listenThread.interrupt();
+    }
 
+    class TCPForwardListenThread extends Thread {
         @Override
         public void run() {
             super.run();
             try {
                 ServerSocket serverSocket = new ServerSocket(8042);
-                while(true) {
+                while(isInterrupted()) {
                     try {
                         Socket socket = serverSocket.accept();
                         Thread thread = new Thread(new TCPForwardHandler(socket));
@@ -54,7 +59,6 @@ public class TCPForwardService extends Service {
     }
 
     class TCPForwardHandler implements Runnable {
-
         private Socket socket;
 
         public TCPForwardHandler(Socket socket) {

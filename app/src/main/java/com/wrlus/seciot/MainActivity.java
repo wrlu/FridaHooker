@@ -1,6 +1,10 @@
 package com.wrlus.seciot;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -13,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -25,6 +28,7 @@ import com.google.gson.Gson;
 import com.wrlus.seciot.agent.FridaServerAgent;
 import com.wrlus.seciot.agent.FrpcAgent;
 import com.wrlus.seciot.agent.StatusCallback;
+import com.wrlus.seciot.model.PortResponse;
 import com.wrlus.seciot.model.VersionResponse;
 import com.wrlus.seciot.msg.Msg;
 import com.wrlus.seciot.util.DeviceHelper;
@@ -35,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,18 +47,13 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private Handler handler = new Handler(this);
-    private Switch switchStatus, switchServerConfig;
+    private Switch switchStatus;
     private ImageView imageStatus;
     private TextView textViewFridaVersion, textViewFrpVersion;
     private Button btnFridaManage, btnFrpcManage, btnRefresh;
-    private CheckBox checkBoxAPICheck, checkBoxConnection, checkBoxDataTransfer, checkBoxFileIO, checkBoxDB;
     private String abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
-    private boolean isFridaServerInstalled = false, isFrpcInstalled = false;
-
-    static {
-        System.loadLibrary("seciot_agent");
-    }
+    private boolean isFridaServerInstalled = false, isFrpcInstalled = false, isFridaServerStarted = false, isFrpcStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +62,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         this.bindWidget();
         this.bindWidgetEvent();
         this.getProductCpuAbi();
-        try {
-            boolean rootStatus = DeviceHelper.requestRootPermission("whoami");
-            Toast.makeText(this, "ROOT状态："+rootStatus, Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "ROOT状态：false", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
@@ -100,35 +93,30 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     public void bindWidget() {
         switchStatus = findViewById(R.id.switchStatus);
-        switchServerConfig = findViewById(R.id.switchServerConfig);
         imageStatus = findViewById(R.id.imageStatus);
         textViewFridaVersion = findViewById(R.id.textViewFridaVersion);
         textViewFrpVersion = findViewById(R.id.textViewFrpVersion);
         btnFridaManage = findViewById(R.id.btnFridaManage);
         btnFrpcManage = findViewById(R.id.btnFrpcManage);
         btnRefresh = new Button(this);
-        checkBoxAPICheck = findViewById(R.id.checkBoxAPICheck);
-        checkBoxConnection = findViewById(R.id.checkBoxConnection);
-        checkBoxDataTransfer = findViewById(R.id.checkBoxDataTransfer);
-        checkBoxFileIO = findViewById(R.id.checkBoxFileIO);
-        checkBoxDB = findViewById(R.id.checkBoxDB);
+        imageStatus.setImageResource(R.mipmap.status_error);
     }
 
     public void bindWidgetEvent() {
         switchStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-            }
-        });
-        switchServerConfig.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                checkBoxAPICheck.setEnabled(!isChecked);
-                checkBoxConnection.setEnabled(!isChecked);
-                checkBoxDataTransfer.setEnabled(!isChecked);
-                checkBoxDB.setEnabled(!isChecked);
-                checkBoxFileIO.setEnabled(!isChecked);
+                if (isChecked) {
+                    if (!isFridaServerStarted) {
+                        startFrida();
+                    }
+                    if (!isFrpcStarted) {
+                        startFrpc();
+                    }
+                } else {
+//                    TODO: 实现服务的停止和清理
+                    switchStatus.setChecked(true);
+                }
             }
         });
         btnFridaManage.setOnClickListener(new View.OnClickListener() {
@@ -150,10 +138,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                downloadFridaServer(fridaVersion, abi);
+                                downloadFridaServer();
                                 break;
                             case 1:
-                                removeFrida(fridaVersion);
+                                removeFrida();
                                 break;
                             default:
                                 break;
@@ -182,10 +170,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                downloadFrpc(frpVersion, abi);
+                                downloadFrpc();
                                 break;
                             case 1:
-                                removeFrpc(frpVersion);
+                                removeFrpc();
                                 break;
                             default:
                                 break;
@@ -197,6 +185,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
+    public String getClientId() {
+        SharedPreferences sharedPref = getSharedPreferences("com.wrlus.seciot", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String clientId = sharedPref.getString("client_id", "Undefined");
+        if (clientId == null || clientId.equals("Undefined")) {
+            clientId = UUID.randomUUID().toString();
+            editor.putString("client_id", clientId);
+            editor.apply();
+        }
+        return clientId;
+    }
+
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Log.i("FridaVersion", fridaVersion);
                 textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
                 this.setProgress(R.id.progressBarFridaInstall, 0);
-                this.checkFridaInstallation(fridaVersion);
+                this.checkFridaInstallation();
                 break;
             case Msg.GET_FRIDA_VERSION_FAILED:
                 textViewFridaVersion.setText("frida server 不可用");
@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Log.i("FrpVerion", frpVersion);
                 textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
                 this.setProgress(R.id.progressBarFrpInstall, 0);
-                this.checkFrpcInstallation(frpVersion);
+                this.checkFrpcInstallation();
                 break;
             case Msg.GET_FRP_VERSION_FAILED:
                 textViewFrpVersion.setText("frp client 不可用");
@@ -226,16 +226,34 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 break;
             case Msg.DOWNLOAD_FRIDA_SUCCESS:
                 this.setProgress(R.id.progressBarFridaInstall, 0.5);
-                this.installFrida( (File) msg.obj, fridaVersion);
+                this.installFrida( (File) msg.obj);
                 break;
             case Msg.DOWNLOAD_FRIDA_FAILED:
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.DOWNLOAD_FRP_SUCCESS:
                 this.setProgress(R.id.progressBarFrpInstall, 0.33);
-                this.installFrpc( (File) msg.obj, frpVersion);
+                this.installFrpc( (File) msg.obj);
                 break;
             case Msg.DOWNLOAD_FRP_FAILED:
+                Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
+                break;
+            case Msg.BIND_REMOTE_PORT_SUCCESS:
+                this.realStartFrpc( (Integer) msg.obj);
+                break;
+            case Msg.BIND_REMOTE_PORT_FAILED:
+                Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
+                break;
+            case Msg.GET_REMOTE_PORT_SUCCESS:
+                this.realStartFrpc( (Integer) msg.obj);
+                break;
+            case Msg.GET_REMOTE_PORT_FAILED:
+                this.bindRemotePort();
+                break;
+            case Msg.UNBIND_REMOTE_PORT_SUCCESS:
+//                TODO: Stop Frpc
+                break;
+            case Msg.UNBIND_REMOTE_PORT_FAILED:
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -319,8 +337,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    public void checkFridaInstallation(String version) {
-        if (FridaServerAgent.checkFridaServerInstallation(version)) {
+    public void checkFridaInstallation() {
+        if (FridaServerAgent.checkFridaServerInstallation(fridaVersion)) {
             textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 就绪");
             this.setProgress(R.id.progressBarFridaInstall, 1);
             isFridaServerInstalled = true;
@@ -331,8 +349,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    public void downloadFridaServer(String version, final String abi) {
-        FridaServerAgent.downloadFridaServer(version, abi, new Callback() {
+    public void downloadFridaServer() {
+        FridaServerAgent.downloadFridaServer(fridaVersion, abi, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_FAILED, e);
@@ -364,16 +382,19 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    public void installFrida(File downloadFile, String version) {
-        FridaServerAgent.installFridaServer(downloadFile, version, new StatusCallback() {
+    public void installFrida(File downloadFile) {
+        FridaServerAgent.installFridaServer(downloadFile, fridaVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         MainActivity.this.setProgress(R.id.progressBarFridaInstall, 1);
-                        MainActivity.this.checkFridaInstallation(fridaVersion);
+                        MainActivity.this.checkFridaInstallation();
                         Toast.makeText(MainActivity.this, "frida server 安装成功", Toast.LENGTH_SHORT).show();
+                        if (isFridaServerInstalled && isFrpcInstalled) {
+                            imageStatus.setImageResource(R.mipmap.status_success);
+                        }
                     }
                 });
             }
@@ -395,14 +416,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    public void removeFrida(String version) {
-        FridaServerAgent.removeFridaServer(version, new StatusCallback() {
+    public void startFrida() {
+        FridaServerAgent.startFridaServer(this, fridaVersion);
+    }
+
+    public void removeFrida() {
+        FridaServerAgent.removeFridaServer(fridaVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFridaInstallation(fridaVersion);
+                        MainActivity.this.checkFridaInstallation();
                         MainActivity.this.setProgress(R.id.progressBarFridaInstall, 0);
                         Toast.makeText(MainActivity.this, "frida server 卸载成功", Toast.LENGTH_SHORT).show();
                     }
@@ -425,8 +450,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    public void checkFrpcInstallation(String version) {
-        if (FrpcAgent.checkFrpcInstallation(version)) {
+    public void checkFrpcInstallation() {
+        if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
             textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 就绪");
             this.setProgress(R.id.progressBarFrpInstall, 1);
             isFrpcInstalled = true;
@@ -437,8 +462,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    public void downloadFrpc(String version, final String abi) {
-        FrpcAgent.downloadFrp(version, abi, new Callback() {
+    public void downloadFrpc() {
+        FrpcAgent.downloadFrp(frpVersion, abi, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRP_FAILED, e);
@@ -471,16 +496,19 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     }
 
-    public void installFrpc(File downloadFile, String version) {
-        FrpcAgent.installFrpc(downloadFile, version, new StatusCallback() {
+    public void installFrpc(File downloadFile) {
+        FrpcAgent.installFrpc(downloadFile, frpVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFrpcInstallation(frpVersion);
+                        MainActivity.this.checkFrpcInstallation();
                         MainActivity.this.setProgress(R.id.progressBarFrpInstall, 1);
                         Toast.makeText(MainActivity.this, "frp client 安装成功", Toast.LENGTH_SHORT).show();
+                        if (isFridaServerInstalled && isFrpcInstalled) {
+                            imageStatus.setImageResource(R.mipmap.status_success);
+                        }
                     }
                 });
             }
@@ -502,8 +530,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    public void bindRemotePort(String clientId) {
-        FrpcAgent.bindRemotePort(clientId, new Callback() {
+    public void startFrpc() {
+        getRemotePort();
+    }
+
+    public void bindRemotePort() {
+        FrpcAgent.bindRemotePort(getClientId(), new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.BIND_REMOTE_PORT_FAILED, e);
@@ -512,13 +544,60 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
+                if (response.isSuccessful()) {
+                    String res = response.body().string();
+                    Gson gson = new Gson();
+                    PortResponse portResponse = gson.fromJson(res, PortResponse.class);
+                    if (portResponse.getStatus() == 0) {
+                        Message msg = handler.obtainMessage(Msg.BIND_REMOTE_PORT_SUCCESS, portResponse.getPort());
+                        handler.sendMessage(msg);
+                    } else {
+                        Message msg = handler.obtainMessage(Msg.BIND_REMOTE_PORT_FAILED);
+                        handler.sendMessage(msg);
+                    }
+                } else {
+                    Message msg = handler.obtainMessage(Msg.BIND_REMOTE_PORT_FAILED);
+                    handler.sendMessage(msg);
+                }
             }
         });
     }
 
-    public void unBindRemotePort(String clientId) {
-        FrpcAgent.unBindRemotePort(clientId, new Callback() {
+    public void getRemotePort() {
+        FrpcAgent.getRemotePort(getClientId(), new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Message msg = handler.obtainMessage(Msg.GET_REMOTE_PORT_FAILED, e);
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String res = response.body().string();
+                    Gson gson = new Gson();
+                    PortResponse portResponse = gson.fromJson(res, PortResponse.class);
+                    if (portResponse.getStatus() == 0) {
+                        Message msg = handler.obtainMessage(Msg.GET_REMOTE_PORT_SUCCESS, portResponse.getPort());
+                        handler.sendMessage(msg);
+                    } else {
+                        Message msg = handler.obtainMessage(Msg.GET_REMOTE_PORT_FAILED);
+                        handler.sendMessage(msg);
+                    }
+                } else {
+                    Message msg = handler.obtainMessage(Msg.GET_REMOTE_PORT_FAILED);
+                    handler.sendMessage(msg);
+                }
+            }
+        });
+    }
+
+    public void realStartFrpc(int port) {
+        FrpcAgent.startFrpc(this, frpVersion, port);
+    }
+
+    public void unBindRemotePort() {
+        FrpcAgent.unBindRemotePort(getClientId(), new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.UNBIND_REMOTE_PORT_FAILED, e);
@@ -527,19 +606,33 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
+                if (response.isSuccessful()) {
+                    String res = response.body().string();
+                    Gson gson = new Gson();
+                    PortResponse portResponse = gson.fromJson(res, PortResponse.class);
+                    if (portResponse.getStatus() == 0) {
+                        Message msg = handler.obtainMessage(Msg.UNBIND_REMOTE_PORT_SUCCESS);
+                        handler.sendMessage(msg);
+                    } else {
+                        Message msg = handler.obtainMessage(Msg.UNBIND_REMOTE_PORT_FAILED);
+                        handler.sendMessage(msg);
+                    }
+                } else {
+                    Message msg = handler.obtainMessage(Msg.UNBIND_REMOTE_PORT_FAILED);
+                    handler.sendMessage(msg);
+                }
             }
         });
     }
 
-    public void removeFrpc(String version) {
-        FrpcAgent.removeFrpc(version, new StatusCallback() {
+    public void removeFrpc() {
+        FrpcAgent.removeFrpc(fridaVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.this.checkFrpcInstallation(fridaVersion);
+                        MainActivity.this.checkFrpcInstallation();
                         MainActivity.this.setProgress(R.id.progressBarFrpInstall, 0);
                         Toast.makeText(MainActivity.this, "frp client 卸载成功", Toast.LENGTH_SHORT).show();
                     }

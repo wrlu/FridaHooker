@@ -1,10 +1,15 @@
 package com.wrlus.seciot.agent;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+
+import com.wrlus.seciot.daemon.FrpcService;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 
 import okhttp3.Callback;
@@ -14,7 +19,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class FrpcAgent {
-    private static final String AGENT_SERVER = "http://10.5.26.179:8080/SecIoT";
+    private static final String AGENT_SERVER_HOST = "10.5.26.179";
+    private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
     private static final String FRP_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frp/v${version}/";
     private static final String FRP_NAME = "frp_${version}_linux_${abi}.tar.gz";
 
@@ -64,13 +70,13 @@ public class FrpcAgent {
                     os.writeBytes("exit\n");
                     os.flush();
                     process.waitFor();
-                    if (process.exitValue() != 0) {
-                        callback.onFailure(process.exitValue(), null);
-                        return;
-                    }
                     String line;
                     while ((line = bs.readLine()) != null) {
                         Log.i("InstallFrpc", line);
+                    }
+                    if (process.exitValue() != 0) {
+                        callback.onFailure(process.exitValue(), null);
+                        return;
                     }
                     callback.onSuccess();
                 } catch (Exception e) {
@@ -84,6 +90,14 @@ public class FrpcAgent {
 
     public static void bindRemotePort(String clientId, Callback callback) {
         String url = AGENT_SERVER + "/agent/bind";
+        OkHttpClient okHttpClient = new OkHttpClient();
+        RequestBody body = new FormBody.Builder().add("client_id", clientId).build();
+        Request request = new Request.Builder().post(body).url(url).build();
+        okHttpClient.newCall(request).enqueue(callback);
+    }
+
+    public static void getRemotePort(String clientId, Callback callback) {
+        String url = AGENT_SERVER + "/agent/getbind";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = new FormBody.Builder().add("client_id", clientId).build();
         Request request = new Request.Builder().post(body).url(url).build();
@@ -141,13 +155,13 @@ public class FrpcAgent {
                     os.writeBytes("exit\n");
                     os.flush();
                     process.waitFor();
-                    if (process.exitValue() != 0) {
-                        callback.onFailure(process.exitValue(), null);
-                        return;
-                    }
                     String line;
                     while ((line = bs.readLine()) != null) {
                         Log.i("RemoveFrpc", line);
+                    }
+                    if (process.exitValue() != 0) {
+                        callback.onFailure(process.exitValue(), null);
+                        return;
                     }
                     callback.onSuccess();
                 } catch (Exception e) {
@@ -160,11 +174,55 @@ public class FrpcAgent {
         thread.start();
     }
 
-    public static void startFrpc(String version) {
-
+    public static void startFrpc(Context context, String version, int port) {
+        try {
+            File frpcIniFile = new File(context.getCacheDir().getAbsolutePath()
+                    + "/frpc.ini");
+            FileWriter fos = new FileWriter(frpcIniFile);
+            fos.write("[common]\n");
+            fos.write("server_addr = "+AGENT_SERVER_HOST+"\n");
+            fos.write("server_port = 8082\n");
+            fos.write("\n");
+            fos.write("[tcp]\n");
+            fos.write("type = tcp\n");
+            fos.write("local_ip = 127.0.0.1\n");
+            fos.write("local_port = 27042\n");
+            fos.write("remote_port = "+port+"\n");
+            fos.flush();
+            fos.close();
+            String targetPath = "/data/local/tmp/seciot/frp/" + version + "/";
+            String[] cmds = {
+                    "rm "+targetPath+"frpc.ini",
+                    "mv "+frpcIniFile.getAbsolutePath()+" "+targetPath
+            };
+            ProcessBuilder processBuilder = new ProcessBuilder("su");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            for (String cmd : cmds) {
+                Log.d("ExecCmd", cmd);
+                os.writeBytes( cmd + "\n");
+            }
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+            String line;
+            while ((line = bs.readLine()) != null) {
+                Log.i("StartFrpc", line);
+            }
+            if (process.exitValue() == 0) {
+                Intent intent = new Intent(context, FrpcService.class);
+                intent.putExtra("version", version);
+                context.startService(intent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void stopFrpc(String version) {
-
+    public static void stopFrpc(Context context) {
+        Intent intent = new Intent(context, FrpcService.class);
+        context.startService(intent);
     }
 }
