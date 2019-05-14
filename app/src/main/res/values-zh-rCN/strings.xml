@@ -1,12 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SecIoT Agent</string>
     <string name="app_status">SecIoT Agent 状态</string>
+    <string name="frp_missing">frp client %1$s-%2$s 缺失</string>
     <string name="frida_missing">frida server %1$s-%2$s 缺失</string>
     <string name="frida_ready">frida server %1$s-%2$s 就绪</string>
-    <string name="frp_missing">frp client %1$s-%2$s 缺失</string>
     <string name="frp_ready">frp client %1$s-%2$s 就绪</string>
     <string name="manage_module">管理模块</string>
-    <string name="image_status" translatable="false">image_status</string>
     <string name="frida_unavaliable">frida server 不可用</string>
     <string name="frp_unavaliable">frp client 不可用</string>
     <string name="android_ver">系统版本: Android %1$s ( API %2$d )</string>

@@ -3,6 +3,7 @@ package com.wrlus.seciot;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -47,9 +48,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private Handler handler = new Handler(this);
     private Switch switchStatus;
     private ImageView imageStatus;
-    private TextView textViewFridaVersion, textViewFrpVersion;
+    private TextView textViewFridaVersion, textViewFrpVersion, textViewAndroidVer, textViewDeviceName, textViewStructure;
     private Button btnFridaManage, btnFrpcManage;
-    private String abi = "Unknown";
+    private String androidVersion = "", deviceName = "", abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
     private boolean isFridaServerInstalled = false, isFrpcInstalled = false, isFridaServerStarted = false, isFrpcStarted = false;
 
@@ -57,11 +58,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.bindWidget();
-        this.bindWidgetEvent();
-        this.getProductCpuAbi();
-        this.getFridaVersionOnServer();
-        this.getFrpsVersionOnServer();
+        bindWidget();
+        bindWidgetEvent();
+        getSystemInfo();
+        getFridaVersionOnServer();
+        getFrpsVersionOnServer();
     }
 
     @Override
@@ -73,12 +74,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case R.id.btnRefresh:
-                checkAll();
-                break;
-            default:
-                break;
+        if (item.getItemId() == R.id.btnRefresh) {
+            checkAll();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -94,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         imageStatus = findViewById(R.id.imageStatus);
         textViewFridaVersion = findViewById(R.id.textViewFridaVersion);
         textViewFrpVersion = findViewById(R.id.textViewFrpVersion);
+        textViewAndroidVer = findViewById(R.id.textViewAndroidVer);
+        textViewDeviceName = findViewById(R.id.textViewDeviceName);
+        textViewStructure = findViewById(R.id.textViewStructure);
         btnFridaManage = findViewById(R.id.btnFridaManage);
         btnFrpcManage = findViewById(R.id.btnFrpcManage);
         imageStatus.setImageResource(R.mipmap.status_error);
@@ -187,25 +187,37 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void checkAll() {
-        this.checkFridaInstallation();
-        this.checkFridaProcess();
-        this.checkFrpcInstallation();
-        this.checkFrpcProcess();
+        if (fridaVersion.equals("Unknown")) {
+            getFridaVersionOnServer();
+        }
+        if (frpVersion.equals("Unknown")) {
+            getFrpsVersionOnServer();
+        }
+        checkFridaInstallation();
+        checkFridaProcess();
+        checkFrpcInstallation();
+        checkFrpcProcess();
     }
 
     public void checkFridaInstallation() {
         if (FridaServerAgent.checkFridaServerInstallation(fridaVersion)) {
-            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 就绪");
+            String fridaReadyString = getString(R.string.frida_ready);
+            fridaReadyString = String.format(fridaReadyString, fridaVersion, abi);
+            textViewFridaVersion.setText(fridaReadyString);
             setProgress(R.id.progressBarFridaInstall, 1);
             isFridaServerInstalled = true;
             if (isFrpcInstalled) {
                 imageStatus.setImageResource(R.mipmap.status_success);
+                switchStatus.setEnabled(true);
             }
         } else {
-            textViewFridaVersion.setText("frida server "+fridaVersion+"-"+abi+" 缺失");
+            String fridaMissingString = getString(R.string.frida_missing);
+            fridaMissingString = String.format(fridaMissingString, fridaVersion, abi);
+            textViewFridaVersion.setText(fridaMissingString);
             setProgress(R.id.progressBarFridaInstall, 0);
             isFridaServerInstalled = false;
             imageStatus.setImageResource(R.mipmap.status_error);
+            switchStatus.setEnabled(false);
         }
     }
 
@@ -223,17 +235,23 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     public void checkFrpcInstallation() {
         if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
-            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 就绪");
+            String frpReadyString = getString(R.string.frp_ready);
+            frpReadyString = String.format(frpReadyString, fridaVersion, abi);
+            textViewFrpVersion.setText(frpReadyString);
             this.setProgress(R.id.progressBarFrpInstall, 1);
             isFrpcInstalled = true;
             if (isFridaServerInstalled) {
                 imageStatus.setImageResource(R.mipmap.status_success);
+                switchStatus.setEnabled(true);
             }
         } else {
-            textViewFrpVersion.setText("frp client "+frpVersion+"-"+abi+" 缺失");
+            String frpMissingString = getString(R.string.frp_missing);
+            frpMissingString = String.format(frpMissingString, fridaVersion, abi);
+            textViewFrpVersion.setText(frpMissingString);
             this.setProgress(R.id.progressBarFrpInstall, 0);
             isFrpcInstalled = false;
             imageStatus.setImageResource(R.mipmap.status_error);
+            switchStatus.setEnabled(false);
         }
     }
 
@@ -270,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 checkAll();
                 break;
             case Msg.GET_FRIDA_VERSION_FAILED:
-                textViewFridaVersion.setText("frida server 不可用");
+                textViewFridaVersion.setText(R.string.frida_unavaliable);
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 this.setProgress(R.id.progressBarFridaInstall, 0);
                 break;
@@ -280,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 checkAll();
                 break;
             case Msg.GET_FRP_VERSION_FAILED:
-                textViewFrpVersion.setText("frp client 不可用");
+                textViewFrpVersion.setText(R.string.frp_unavaliable);
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 setProgress(R.id.progressBarFrpInstall, 0);
                 break;
@@ -323,11 +341,21 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return true;
     }
 
-    public void getProductCpuAbi() {
-        String abi = DeviceHelper.getProductCpuAbi();
-        if (abi == null) {
-            Toast.makeText(this, "Get product cpu abi failed", Toast.LENGTH_SHORT).show();
-        } else if (abi.contains("arm64")) {
+    public void getSystemInfo() {
+        String androidVerString = getString(R.string.android_ver);
+        androidVerString = String.format(androidVerString, DeviceHelper.getAndroidVersion(), DeviceHelper.getAPILevel());
+        textViewAndroidVer.setText(androidVerString);
+
+        String deviceNameString = getString(R.string.device_name);
+        deviceNameString = String.format(deviceNameString, DeviceHelper.getProductName());
+        textViewDeviceName.setText(deviceNameString);
+
+        String[] abis = DeviceHelper.getSupportedAbis();
+        String abi = abis[0];
+        String deviceAbiString = getString(R.string.device_abi);
+        deviceAbiString = String.format(deviceAbiString, abi);
+        textViewStructure.setText(deviceAbiString);
+        if (abi.contains("arm64")) {
             this.abi = "arm64";
         } else if (abi.contains("arm")) {
             this.abi = "arm";
@@ -350,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     String res = response.body().string();
                     Gson gson = new Gson();
                     VersionResponse versionResponse = gson.fromJson(res, VersionResponse.class);
@@ -373,13 +401,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         FrpcAgent.getFrpsVersionOnServer(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Message msg = handler.obtainMessage(Msg.GET_FRIDA_VERSION_FAILED, e);
+                Message msg = handler.obtainMessage(Msg.GET_FRP_VERSION_FAILED, e);
                 handler.sendMessage(msg);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     String res = response.body().string();
                     Gson gson = new Gson();
                     VersionResponse versionResponse = gson.fromJson(res, VersionResponse.class);
@@ -408,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     InputStream is = response.body().byteStream();
                     File dlFile = new File(MainActivity.this.getCacheDir().getAbsolutePath()
                             + "/frida-server-"+fridaVersion+"-android-"+abi+".tar.gz");
@@ -510,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     InputStream is = response.body().byteStream();
                     File dlFile = new File(MainActivity.this.getCacheDir().getAbsolutePath()
                             + "/frp_"+frpVersion+"_linux_"+abi+".tar.gz");
@@ -587,7 +615,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     String res = response.body().string();
                     Gson gson = new Gson();
                     PortResponse portResponse = gson.fromJson(res, PortResponse.class);
@@ -616,7 +644,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     String res = response.body().string();
                     Gson gson = new Gson();
                     PortResponse portResponse = gson.fromJson(res, PortResponse.class);
@@ -649,7 +677,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     String res = response.body().string();
                     Gson gson = new Gson();
                     PortResponse portResponse = gson.fromJson(res, PortResponse.class);
@@ -703,7 +731,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void run() {
                 ProgressBar bar = findViewById(progressBarId);
-                bar.setProgress((int) (bar.getMax() * percentage));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    bar.setProgress((int) (bar.getMax() * percentage), true);
+                } else {
+                    bar.setProgress((int) (bar.getMax() * percentage));
+                }
             }
         });
     }

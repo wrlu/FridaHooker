@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SecIoT Agent</string>
+    <string name="app_status">SecIoT Agent Status</string>
+    <string name="frida_missing">frida server %1$s-%2$s missing</string>
+    <string name="frida_ready">frida server %1$s-%2$s ready</string>
+    <string name="frp_missing">frp client %1$s-%2$s missing</string>
+    <string name="frp_ready">frp client %1$s-%2$s ready</string>
+    <string name="manage_module">Manage</string>
+    <string name="frida_unavaliable">frida server unavaliable</string>
+    <string name="frp_unavaliable">frp client unavaliable</string>
+    <string name="android_ver">System Version: Android %1$s ( API %2$d )</string>
+    <string name="device_name">Device Name: %1$s</string>
+    <string name="device_abi">Structure: %1$s</string>
+</resources>
