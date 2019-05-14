@@ -31,6 +31,7 @@ import com.wrlus.seciot.model.PortResponse;
 import com.wrlus.seciot.model.VersionResponse;
 import com.wrlus.seciot.msg.Msg;
 import com.wrlus.seciot.util.DeviceHelper;
+import com.wrlus.seciot.util.RootShellHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private ImageView imageStatus;
     private TextView textViewFridaVersion, textViewFrpVersion, textViewAndroidVer, textViewDeviceName, textViewStructure;
     private Button btnFridaManage, btnFrpcManage;
-    private String androidVersion = "", deviceName = "", abi = "Unknown";
+    private String abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
     private boolean isFridaServerInstalled = false, isFrpcInstalled = false, isFridaServerStarted = false, isFrpcStarted = false;
 
@@ -84,6 +85,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void onStart() {
         super.onStart();
         this.checkAll();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        try {
+            rootShellHelper.exit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void bindWidget() {
@@ -194,9 +206,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             getFrpsVersionOnServer();
         }
         checkFridaInstallation();
-        checkFridaProcess();
+//        checkFridaProcess();
         checkFrpcInstallation();
-        checkFrpcProcess();
+//        checkFrpcProcess();
     }
 
     public void checkFridaInstallation() {
@@ -221,17 +233,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    public void checkFridaProcess() {
-        if (FridaServerAgent.checkFridaServerProcess()) {
-            isFridaServerStarted = true;
-            if (isFrpcStarted) {
-                switchStatus.setChecked(true);
-            }
-        } else {
-            isFridaServerStarted = false;
-            switchStatus.setChecked(false);
-        }
-    }
+//    public void checkFridaProcess() {
+//        if (FridaServerAgent.checkFridaServerProcess()) {
+//            isFridaServerStarted = true;
+//            if (isFrpcStarted) {
+//                switchStatus.setChecked(true);
+//            }
+//        } else {
+//            isFridaServerStarted = false;
+//            switchStatus.setChecked(false);
+//        }
+//    }
 
     public void checkFrpcInstallation() {
         if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
@@ -255,17 +267,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    public void checkFrpcProcess() {
-        if (FrpcAgent.checkFrpcProcess()) {
-            isFrpcStarted = true;
-            if (isFridaServerStarted) {
-                switchStatus.setChecked(true);
-            }
-        } else {
-            isFrpcStarted = false;
-            switchStatus.setChecked(false);
-        }
-    }
+//    public void checkFrpcProcess() {
+//        if (FrpcAgent.checkFrpcProcess()) {
+//            isFrpcStarted = true;
+//            if (isFridaServerStarted) {
+//                switchStatus.setChecked(true);
+//            }
+//        } else {
+//            isFrpcStarted = false;
+//            switchStatus.setChecked(false);
+//        }
+//    }
 
     public String getClientId() {
         SharedPreferences sharedPref = getSharedPreferences("com.wrlus.seciot", Context.MODE_PRIVATE);
@@ -490,13 +502,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void startFrida() {
-        FridaServerAgent.startFridaServer(this, fridaVersion);
-        checkAll();
+        FridaServerAgent.startFridaServer(fridaVersion);
+        isFridaServerStarted = true;
     }
 
     public void stopFrida() {
         FridaServerAgent.stopFridaServer(this);
-        checkAll();
+        isFridaServerStarted = false;
     }
 
     public void removeFrida() {
@@ -597,12 +609,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         getRemotePort();
     }
 
+    public void realStartFrpc(int port) {
+        FrpcAgent.startFrpc(this, frpVersion, port);
+        isFrpcStarted = true;
+    }
+
     public void stopFrpc() {
         unBindRemotePort();
     }
 
     public void realStopFrpc() {
-        FrpcAgent.stopFrpc(this);
+        FrpcAgent.stopFrpc();
+        isFrpcStarted = false;
     }
 
     public void bindRemotePort() {
@@ -661,10 +679,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 }
             }
         });
-    }
-
-    public void realStartFrpc(int port) {
-        FrpcAgent.startFrpc(this, frpVersion, port);
     }
 
     public void unBindRemotePort() {

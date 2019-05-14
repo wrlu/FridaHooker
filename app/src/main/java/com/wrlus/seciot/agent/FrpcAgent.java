@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.wrlus.seciot.daemon.FrpcService;
+import com.wrlus.seciot.util.RootShellHelper;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import okhttp3.Callback;
@@ -193,57 +195,74 @@ public class FrpcAgent {
             String targetPath = "/data/local/tmp/seciot/frp/" + version + "/";
             String[] cmds = {
                     "rm "+targetPath+"frpc.ini",
-                    "mv "+frpcIniFile.getAbsolutePath()+" "+targetPath
+                    "mv "+frpcIniFile.getAbsolutePath()+" "+targetPath,
+                    "cd "+targetPath,
+                    "chmod +x frpc",
+                    "./frpc -c frpc.ini"
             };
-            ProcessBuilder processBuilder = new ProcessBuilder("su");
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            for (String cmd : cmds) {
-                Log.d("ExecCmd", cmd);
-                os.writeBytes( cmd + "\n");
+//            ProcessBuilder processBuilder = new ProcessBuilder("su");
+//            processBuilder.redirectErrorStream(true);
+//            Process process = processBuilder.start();
+//            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+//            for (String cmd : cmds) {
+//                Log.d("ExecCmd", cmd);
+//                os.writeBytes( cmd + "\n");
+//            }
+//            os.writeBytes("exit\n");
+//            os.flush();
+//            process.waitFor();
+//            String line;
+//            while ((line = bs.readLine()) != null) {
+//                Log.i("StartFrpc", line);
+//            }
+//            if (process.exitValue() == 0) {
+//                Intent intent = new Intent(context, FrpcService.class);
+//                intent.putExtra("version", version);
+//                context.startService(intent);
+//            }
+            RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+            try {
+                rootShellHelper.execute(cmds);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-            String line;
-            while ((line = bs.readLine()) != null) {
-                Log.i("StartFrpc", line);
-            }
-            if (process.exitValue() == 0) {
-                Intent intent = new Intent(context, FrpcService.class);
-                intent.putExtra("version", version);
-                context.startService(intent);
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static boolean checkFrpcProcess() {
+//    public static boolean checkFrpcProcess() {
+//        try {
+//            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frpc");
+//            processBuilder.redirectErrorStream(true);
+//            Process process = processBuilder.start();
+//            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            process.waitFor();
+//            String line;
+//            while ((line = bs.readLine()) != null) {
+//                Log.i("FrpcProcessCheck", line);
+//            }
+//            if (process.exitValue() == 0) {
+//                return true;
+//            }
+//            Log.e("FrpcProcessCheck", String.valueOf(process.exitValue()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+
+    public static void stopFrpc() {
+//        Intent intent = new Intent(context, FrpcService.class);
+//        context.startService(intent);
+        String cmd = "kill -9 $(pidof frpc)";
+        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frpc");
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            process.waitFor();
-            String line;
-            while ((line = bs.readLine()) != null) {
-                Log.i("FrpcProcessCheck", line);
-            }
-            if (process.exitValue() == 0) {
-                return true;
-            }
-            Log.e("FrpcProcessCheck", String.valueOf(process.exitValue()));
-        } catch (Exception e) {
+            rootShellHelper.exit();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
-    }
-
-    public static void stopFrpc(Context context) {
-        Intent intent = new Intent(context, FrpcService.class);
-        context.startService(intent);
     }
 }

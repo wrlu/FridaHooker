@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.wrlus.seciot.daemon.FridaServerService;
+import com.wrlus.seciot.util.RootShellHelper;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import okhttp3.Callback;
@@ -145,35 +147,54 @@ public class FridaServerAgent {
         thread.start();
     }
 
-    public static void startFridaServer(Context context, String version) {
-        Intent intent = new Intent(context, FridaServerService.class);
-        intent.putExtra("version", version);
-        context.startService(intent);
-    }
-
-    public static boolean checkFridaServerProcess() {
+    public static void startFridaServer(String version) {
+        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
+        String[] cmds = {
+                "cd "+targetPath,
+                "chmod +x frida-server",
+                "./frida-server &"
+        };
+        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frida-server");
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            process.waitFor();
-            String line;
-            while ((line = bs.readLine()) != null) {
-                Log.i("FridaProcessCheck", line);
-            }
-            if (process.exitValue() == 0) {
-                return true;
-            }
-            Log.e("FridaProcessCheck", String.valueOf(process.exitValue()));
-        } catch (Exception e) {
+            rootShellHelper.execute(cmds);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
     }
+
+//    public static boolean checkFridaServerProcess() {
+//        try {
+//            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frida-server");
+//            processBuilder.redirectErrorStream(true);
+//            Process process = processBuilder.start();
+//            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            process.waitFor();
+//            String line;
+//            while ((line = bs.readLine()) != null) {
+//                Log.i("FridaProcessCheck", line);
+//            }
+//            if (process.exitValue() == 0) {
+//                return true;
+//            }
+//            Log.e("FridaProcessCheck", String.valueOf(process.exitValue()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
     public static void stopFridaServer(Context context) {
         Intent intent = new Intent(context, FridaServerService.class);
         context.stopService(intent);
+    }
+
+    public static void stopFridaServer() {
+        String cmd = "kill -9 $(pidof frida-server)";
+        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        try {
+            rootShellHelper.exit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

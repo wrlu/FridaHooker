@@ -89,11 +89,11 @@ public class FridaServerService extends Service {
                 }
                 os.writeBytes("exit\n");
                 os.flush();
-                process.waitFor();
                 String line;
                 while ((line = bs.readLine()) != null) {
                     Log.i("FridaServerThread", line);
                 }
+                process.waitFor();
                 Log.e("FridaServerThread", "Process frida server exited with code "+process.exitValue());
             } catch (Exception e) {
                 e.printStackTrace();
