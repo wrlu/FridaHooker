@@ -1,6 +1,6 @@
 package com.wrlus.seciot.model;
 
-public abstract class BaseResponse {
+public class BaseResponse {
     private long status;
     private String reason;
 

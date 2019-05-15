@@ -12,17 +12,30 @@ public class RootShellHelper {
     private DataOutputStream os;
     private BufferedReader bs;
     private Thread readThread;
+    private boolean isRunning = false;
 
     private RootShellHelper() {
-//        Thread shellThread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        });
-//        shellThread.setDaemon(true);
-//        shellThread.setName("Thread-RootShell");
-//        shellThread.start();
+        if (!isRunning) {
+            init();
+        }
+        Log.d("RootShellHelper", "Creating RootShellHelper Singleton.");
+    }
+
+    public static RootShellHelper getInstance() {
+        if (instance == null) {
+            synchronized (RootShellHelper.class) {
+                if (instance == null) {
+                    instance = new RootShellHelper();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public synchronized void init() {
+        if (isRunning) {
+            return;
+        }
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("su");
             processBuilder.redirectErrorStream(true);
@@ -51,25 +64,21 @@ public class RootShellHelper {
         readThread.setDaemon(true);
         readThread.setName("Thread-ReadShell");
         readThread.start();
-        Log.d("RootShellHelper", "Creating RootShellHelper Singleton.");
-    }
-    public static RootShellHelper getInstance() {
-        if (instance == null) {
-            synchronized (RootShellHelper.class) {
-                if (instance == null) {
-                    instance = new RootShellHelper();
-                }
-            }
-        }
-        return instance;
+        isRunning = true;
     }
 
     public synchronized void execute(String cmd) throws IOException {
+        if (!isRunning) {
+            init();
+        }
         os.writeBytes(cmd + "\n");
         os.flush();
     }
 
     public synchronized void execute(String[] cmds) throws IOException {
+        if (!isRunning) {
+            init();
+        }
         for (String cmd : cmds) {
             os.writeBytes(cmd + "\n");
         }
@@ -77,10 +86,14 @@ public class RootShellHelper {
     }
 
     public synchronized void exit() throws IOException {
+        if (!isRunning) {
+            return;
+        }
         os.writeBytes("exit\n");
         os.flush();
         if (readThread != null) {
             readThread.interrupt();
         }
+        isRunning = false;
     }
 }

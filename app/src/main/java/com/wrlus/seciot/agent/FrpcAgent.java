@@ -1,10 +1,8 @@
 package com.wrlus.seciot.agent;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
-import com.wrlus.seciot.daemon.FrpcService;
 import com.wrlus.seciot.util.RootShellHelper;
 
 import java.io.BufferedReader;
@@ -185,7 +183,7 @@ public class FrpcAgent {
             fos.write("server_addr = "+AGENT_SERVER_HOST+"\n");
             fos.write("server_port = 8082\n");
             fos.write("\n");
-            fos.write("[tcp]\n");
+            fos.write("[tcp"+port+"]\n");
             fos.write("type = tcp\n");
             fos.write("local_ip = 127.0.0.1\n");
             fos.write("local_port = 27042\n");
@@ -198,29 +196,8 @@ public class FrpcAgent {
                     "mv "+frpcIniFile.getAbsolutePath()+" "+targetPath,
                     "cd "+targetPath,
                     "chmod +x frpc",
-                    "./frpc -c frpc.ini"
+                    "./frpc -c frpc.ini &"
             };
-//            ProcessBuilder processBuilder = new ProcessBuilder("su");
-//            processBuilder.redirectErrorStream(true);
-//            Process process = processBuilder.start();
-//            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//            DataOutputStream os = new DataOutputStream(process.getOutputStream());
-//            for (String cmd : cmds) {
-//                Log.d("ExecCmd", cmd);
-//                os.writeBytes( cmd + "\n");
-//            }
-//            os.writeBytes("exit\n");
-//            os.flush();
-//            process.waitFor();
-//            String line;
-//            while ((line = bs.readLine()) != null) {
-//                Log.i("StartFrpc", line);
-//            }
-//            if (process.exitValue() == 0) {
-//                Intent intent = new Intent(context, FrpcService.class);
-//                intent.putExtra("version", version);
-//                context.startService(intent);
-//            }
             RootShellHelper rootShellHelper = RootShellHelper.getInstance();
             try {
                 rootShellHelper.execute(cmds);
@@ -233,31 +210,7 @@ public class FrpcAgent {
         }
     }
 
-//    public static boolean checkFrpcProcess() {
-//        try {
-//            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "ps | grep frpc");
-//            processBuilder.redirectErrorStream(true);
-//            Process process = processBuilder.start();
-//            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//            process.waitFor();
-//            String line;
-//            while ((line = bs.readLine()) != null) {
-//                Log.i("FrpcProcessCheck", line);
-//            }
-//            if (process.exitValue() == 0) {
-//                return true;
-//            }
-//            Log.e("FrpcProcessCheck", String.valueOf(process.exitValue()));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-
     public static void stopFrpc() {
-//        Intent intent = new Intent(context, FrpcService.class);
-//        context.startService(intent);
-        String cmd = "kill -9 $(pidof frpc)";
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
             rootShellHelper.exit();

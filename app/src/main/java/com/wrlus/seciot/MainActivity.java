@@ -26,7 +26,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.wrlus.seciot.agent.FridaServerAgent;
 import com.wrlus.seciot.agent.FrpcAgent;
+import com.wrlus.seciot.agent.SecIoTAgent;
 import com.wrlus.seciot.agent.StatusCallback;
+import com.wrlus.seciot.model.BaseResponse;
 import com.wrlus.seciot.model.PortResponse;
 import com.wrlus.seciot.model.VersionResponse;
 import com.wrlus.seciot.msg.Msg;
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private String abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
     private boolean isFridaServerInstalled = false, isFrpcInstalled = false, isFridaServerStarted = false, isFrpcStarted = false;
+    private int port = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         } catch (IOException e) {
             e.printStackTrace();
         }
+        updateDevice(false);
     }
 
     public void bindWidget() {
@@ -206,9 +210,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             getFrpsVersionOnServer();
         }
         checkFridaInstallation();
-//        checkFridaProcess();
         checkFrpcInstallation();
-//        checkFrpcProcess();
     }
 
     public void checkFridaInstallation() {
@@ -233,18 +235,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-//    public void checkFridaProcess() {
-//        if (FridaServerAgent.checkFridaServerProcess()) {
-//            isFridaServerStarted = true;
-//            if (isFrpcStarted) {
-//                switchStatus.setChecked(true);
-//            }
-//        } else {
-//            isFridaServerStarted = false;
-//            switchStatus.setChecked(false);
-//        }
-//    }
-
     public void checkFrpcInstallation() {
         if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
             String frpReadyString = getString(R.string.frp_ready);
@@ -266,18 +256,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             switchStatus.setEnabled(false);
         }
     }
-
-//    public void checkFrpcProcess() {
-//        if (FrpcAgent.checkFrpcProcess()) {
-//            isFrpcStarted = true;
-//            if (isFridaServerStarted) {
-//                switchStatus.setChecked(true);
-//            }
-//        } else {
-//            isFrpcStarted = false;
-//            switchStatus.setChecked(false);
-//        }
-//    }
 
     public String getClientId() {
         SharedPreferences sharedPref = getSharedPreferences("com.wrlus.seciot", Context.MODE_PRIVATE);
@@ -329,23 +307,37 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.BIND_REMOTE_PORT_SUCCESS:
+                port = (Integer) msg.obj;
                 realStartFrpc( (Integer) msg.obj);
                 break;
             case Msg.BIND_REMOTE_PORT_FAILED:
+                port = 0;
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
                 break;
             case Msg.GET_REMOTE_PORT_SUCCESS:
+                port = (Integer) msg.obj;
                 realStartFrpc( (Integer) msg.obj);
                 break;
             case Msg.GET_REMOTE_PORT_FAILED:
+                port = 0;
                 bindRemotePort();
                 break;
             case Msg.UNBIND_REMOTE_PORT_SUCCESS:
+                port = 0;
                 realStopFrpc();
                 break;
             case Msg.UNBIND_REMOTE_PORT_FAILED:
-                realStopFrpc();
                 Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
+                break;
+            case Msg.ADD_DEVICE_SUCCESS:
+                break;
+            case Msg.ADD_DEVICE_FAILED:
+                Toast.makeText(MainActivity.this, "无法连接到服务器，请检查网络设置。", Toast.LENGTH_SHORT).show();
+                break;
+            case Msg.UPDATE_DEVICE_SUCCESS:
+                break;
+            case Msg.UPDATE_DEVICE_FAILED:
+                addDevice();
                 break;
             default:
                 Log.e("MessageHandler", "Unknown message: msg.what = "+msg.what);
@@ -507,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void stopFrida() {
-        FridaServerAgent.stopFridaServer(this);
+        FridaServerAgent.stopFridaServer();
         isFridaServerStarted = false;
     }
 
@@ -612,6 +604,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public void realStartFrpc(int port) {
         FrpcAgent.startFrpc(this, frpVersion, port);
         isFrpcStarted = true;
+        updateDevice(true);
     }
 
     public void stopFrpc() {
@@ -621,6 +614,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public void realStopFrpc() {
         FrpcAgent.stopFrpc();
         isFrpcStarted = false;
+        updateDevice(false);
     }
 
     public void bindRemotePort() {
@@ -735,6 +729,64 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         Toast.makeText(MainActivity.this, "frp client 卸载失败", Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        });
+    }
+
+    public void addDevice() {
+        SecIoTAgent.addDevice(getClientId(), port, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Message msg = handler.obtainMessage(Msg.ADD_DEVICE_FAILED, e);
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful() && response.body() != null) {
+                    String res = response.body().string();
+                    Gson gson = new Gson();
+                    BaseResponse baseResponse = gson.fromJson(res, BaseResponse.class);
+                    if (baseResponse.getStatus() == 0) {
+                        Message msg = handler.obtainMessage(Msg.ADD_DEVICE_SUCCESS);
+                        handler.sendMessage(msg);
+                    } else {
+                        Message msg = handler.obtainMessage(Msg.ADD_DEVICE_FAILED);
+                        handler.sendMessage(msg);
+                    }
+                } else {
+                    Message msg = handler.obtainMessage(Msg.ADD_DEVICE_FAILED);
+                    handler.sendMessage(msg);
+                }
+            }
+        });
+    }
+
+    public void updateDevice(boolean isOnline) {
+        SecIoTAgent.updateDeviceStatus(getClientId(), port, isOnline, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Message msg = handler.obtainMessage(Msg.UPDATE_DEVICE_FAILED, e);
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful() && response.body() != null) {
+                    String res = response.body().string();
+                    Gson gson = new Gson();
+                    BaseResponse baseResponse = gson.fromJson(res, BaseResponse.class);
+                    if (baseResponse.getStatus() == 0) {
+                        Message msg = handler.obtainMessage(Msg.UPDATE_DEVICE_SUCCESS);
+                        handler.sendMessage(msg);
+                    } else {
+                        Message msg = handler.obtainMessage(Msg.UPDATE_DEVICE_FAILED);
+                        handler.sendMessage(msg);
+                    }
+                } else {
+                    Message msg = handler.obtainMessage(Msg.UPDATE_DEVICE_FAILED);
+                    handler.sendMessage(msg);
+                }
             }
         });
     }
