@@ -213,6 +213,7 @@ public class FrpcAgent {
     public static void stopFrpc() {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
+            rootShellHelper.execute("kill -9 $(pidof frpc)");
             rootShellHelper.exit();
         } catch (IOException e) {
             e.printStackTrace();

@@ -162,6 +162,7 @@ public class FridaServerAgent {
     public static void stopFridaServer() {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
+            rootShellHelper.execute("kill -9 $(pidof frida-server)");
             rootShellHelper.exit();
         } catch (IOException e) {
             e.printStackTrace();
