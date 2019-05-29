@@ -15,7 +15,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class FridaServerAgent {
-    private static final String AGENT_SERVER_HOST = "10.5.26.179";
+    private static final String AGENT_SERVER_HOST = "192.168.43.7";
     private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
     private static final String FRIDA_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frida/${version}/";
     private static final String FRIDA_SERVER_NAME = "frida-server-${version}-android-${abi}.tar.gz";

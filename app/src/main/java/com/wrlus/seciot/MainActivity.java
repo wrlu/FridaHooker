@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public void checkFrpcInstallation() {
         if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
             String frpReadyString = getString(R.string.frp_ready);
-            frpReadyString = String.format(frpReadyString, fridaVersion, abi);
+            frpReadyString = String.format(frpReadyString, frpVersion, abi);
             textViewFrpVersion.setText(frpReadyString);
             this.setProgress(R.id.progressBarFrpInstall, 1);
             isFrpcInstalled = true;
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             }
         } else {
             String frpMissingString = getString(R.string.frp_missing);
-            frpMissingString = String.format(frpMissingString, fridaVersion, abi);
+            frpMissingString = String.format(frpMissingString, frpVersion, abi);
             textViewFrpVersion.setText(frpMissingString);
             this.setProgress(R.id.progressBarFrpInstall, 0);
             isFrpcInstalled = false;

@@ -19,7 +19,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class FrpcAgent {
-    private static final String AGENT_SERVER_HOST = "10.5.26.179";
+    private static final String AGENT_SERVER_HOST = "192.168.43.7";
     private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
     private static final String FRP_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frp/v${version}/";
     private static final String FRP_NAME = "frp_${version}_linux_${abi}.tar.gz";

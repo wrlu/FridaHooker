@@ -9,7 +9,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class SecIoTAgent {
-    private static final String AGENT_SERVER_HOST = "10.5.26.179";
+    private static final String AGENT_SERVER_HOST = "192.168.43.7";
     private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
 
     public static void addDevice(String clientId, int port, Callback callback) {
