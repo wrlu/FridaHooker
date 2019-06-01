@@ -12,6 +12,7 @@ public class RootShellHelper {
     private DataOutputStream os;
     private BufferedReader bs;
     private Thread readThread;
+    private Process process;
     private boolean isRunning = false;
 
     private RootShellHelper() {
@@ -39,7 +40,7 @@ public class RootShellHelper {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("su");
             processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
+            process = processBuilder.start();
             bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
             os = new DataOutputStream(process.getOutputStream());
         } catch (IOException e) {
@@ -49,7 +50,7 @@ public class RootShellHelper {
             @Override
             public void run() {
                 try {
-                    while(Thread.currentThread().isInterrupted()) {
+                    while(!Thread.currentThread().isInterrupted()) {
                         String line;
                         while ((line = bs.readLine()) != null) {
                             Log.i("RootShell", line);
@@ -94,6 +95,7 @@ public class RootShellHelper {
         if (readThread != null) {
             readThread.interrupt();
         }
+        process.destroy();
         isRunning = false;
     }
 }
