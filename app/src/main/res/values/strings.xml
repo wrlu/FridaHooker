@@ -5,11 +5,19 @@
     <string name="frida_ready">frida server %1$s-%2$s 就绪</string>
     <string name="frp_missing">frp client %1$s-%2$s 缺失</string>
     <string name="frp_ready">frp client %1$s-%2$s 就绪</string>
-    <string name="manage_module">管理模块</string>
+    <string name="manage_module">管理</string>
     <string name="image_status" translatable="false">image_status</string>
     <string name="frida_unavaliable">frida server 不可用</string>
     <string name="frp_unavaliable">frp client 不可用</string>
     <string name="android_ver">系统版本: Android %1$s ( API %2$d )</string>
     <string name="device_name">设备名称: %1$s</string>
     <string name="device_abi">体系结构: %1$s</string>
+    <string name="server_host">SecIoT 服务: %1$s</string>
+    <string name="refresh">刷新代理状态</string>
+    <string name="settings">全局配置</string>
+    <string name="about">关于 SecIoT Agent</string>
+    <string name="gplv2">1.0-aosp\\n\\n 本程序是自由软件，您可以根据由自由软件基金会出版 GNU 通用公共许可证第2版的条款和条件重新分发和/或修改它。\\n 发布本程序只是希望它对您有用，但不包含任何保证，甚至没有对适合特定用途的隐含保证。\\n 有关详细信息，请参阅 GNU 通用公共许可证。\\n 获取源代码: https://gitlab.com/wrlu/seciot-agent-android</string>
+    <string name="frps_ip">Frps 代理: %1$s</string>
+    <string name="reset">重置</string>
+    <string name="reset_client_id">重置客户端标识符</string>
 </resources>

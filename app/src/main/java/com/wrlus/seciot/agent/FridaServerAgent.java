@@ -15,27 +15,44 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class FridaServerAgent {
-    private static final String AGENT_SERVER_HOST = "192.168.43.7";
-    private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
-    private static final String FRIDA_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frida/${version}/";
-    private static final String FRIDA_SERVER_NAME = "frida-server-${version}-android-${abi}.tar.gz";
+    private static FridaServerAgent instance;
+    private String AGENT_SERVER = "http://140.143.52.29:8080/SecIoT";
 
-    public static void getFridaVersionOnServer(Callback callback) {
+    private FridaServerAgent() {
+        Log.d("FridaServerAgent", "Create FridaServerAgent singleton");
+    }
+
+    public static FridaServerAgent getInstance() {
+        if (instance == null) {
+            synchronized (FridaServerAgent.class) {
+                if (instance == null) {
+                    instance = new FridaServerAgent();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void setAgentServer(String serverUrl) {
+        AGENT_SERVER = serverUrl;
+    }
+
+    public void getFridaVersionOnServer(Callback callback) {
         String url = AGENT_SERVER + "/agent/frida-version";
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().get().url(url).build();
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void downloadFridaServer(String version, String abi, Callback callback) {
-        String url = FRIDA_DOWNLOAD_LINK.replace("${version}", version) +
-                FRIDA_SERVER_NAME.replace("${version}", version).replace("${abi}", abi);
+    public void downloadFridaServer(String version, String abi, Callback callback) {
+        String url = AGENT_SERVER + "/attach/downloads/frida/${version}/".replace("${version}", version) +
+                "frida-server-${version}-android-${abi}.tar.gz".replace("${version}", version).replace("${abi}", abi);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void installFridaServer(final File downloadFile, final String version, final StatusCallback callback) {
+    public void installFridaServer(final File downloadFile, final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         final String[] cmds = {
                 "mkdir /data/local/tmp/seciot/",
@@ -82,7 +99,7 @@ public class FridaServerAgent {
         thread.start();
     }
 
-    public static boolean checkFridaServerInstallation(String version) {
+    public boolean checkFridaServerInstallation(String version) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("ls", targetPath + "frida-server");
@@ -104,7 +121,7 @@ public class FridaServerAgent {
         return false;
     }
 
-    public static void removeFridaServer(final String version, final StatusCallback callback) {
+    public void removeFridaServer(final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         final String[] cmds = {
                 "rm -rf " + targetPath
@@ -144,7 +161,7 @@ public class FridaServerAgent {
         thread.start();
     }
 
-    public static void startFridaServer(String version) {
+    public void startFridaServer(String version) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         String[] cmds = {
                 "cd "+targetPath,
@@ -159,7 +176,7 @@ public class FridaServerAgent {
         }
     }
 
-    public static void stopFridaServer() {
+    public void stopFridaServer() {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
             rootShellHelper.execute("kill -9 $(pidof frida-server)");

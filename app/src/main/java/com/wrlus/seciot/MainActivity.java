@@ -2,6 +2,7 @@ package com.wrlus.seciot;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
@@ -53,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private ImageView imageStatus;
     private TextView textViewFridaVersion, textViewFrpVersion, textViewAndroidVer, textViewDeviceName, textViewStructure;
     private Button btnFridaManage, btnFrpcManage;
+    private FridaServerAgent fridaServerAgent = FridaServerAgent.getInstance();
+    private FrpcAgent frpcAgent = FrpcAgent.getInstance();
+    private SecIoTAgent secIoTAgent = SecIoTAgent.getInstance();
     private String abi = "Unknown";
     private String fridaVersion = "Unknown", frpVersion = "Unknown";
     private boolean isFridaServerInstalled = false, isFrpcInstalled = false, isFridaServerStarted = false, isFrpcStarted = false;
@@ -80,6 +84,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public boolean onOptionsItemSelected(MenuItem item){
         if (item.getItemId() == R.id.btnRefresh) {
             checkAll();
+        } else if (item.getItemId() == R.id.btnSettings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        } else if (item.getItemId() == R.id.btnAbout) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle(R.string.about);
+            dialog.setMessage(R.string.gplv2);
+            dialog.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -87,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     protected void onStart() {
         super.onStart();
-        this.checkAll();
+        configureServer();
+        configureFrpsIp();
+        checkAll();
     }
 
     @Override
@@ -214,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void checkFridaInstallation() {
-        if (FridaServerAgent.checkFridaServerInstallation(fridaVersion)) {
+        if (fridaServerAgent.checkFridaServerInstallation(fridaVersion)) {
             String fridaReadyString = getString(R.string.frida_ready);
             fridaReadyString = String.format(fridaReadyString, fridaVersion, abi);
             textViewFridaVersion.setText(fridaReadyString);
@@ -236,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void checkFrpcInstallation() {
-        if (FrpcAgent.checkFrpcInstallation(frpVersion)) {
+        if (frpcAgent.checkFrpcInstallation(frpVersion)) {
             String frpReadyString = getString(R.string.frp_ready);
             frpReadyString = String.format(frpReadyString, frpVersion, abi);
             textViewFrpVersion.setText(frpReadyString);
@@ -267,6 +287,32 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             editor.apply();
         }
         return clientId;
+    }
+
+    public void configureServer() {
+        SharedPreferences sharedPref = getSharedPreferences("com.wrlus.seciot", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String serverUrl = sharedPref.getString("server_url", "Undefined");
+        if (serverUrl == null || serverUrl.equals("Undefined")) {
+            serverUrl = "http://140.143.53.29:8080/SecIoT";
+            editor.putString("server_url", serverUrl);
+            editor.apply();
+        }
+        fridaServerAgent.setAgentServer(serverUrl);
+        frpcAgent.setAgentServer(serverUrl);
+        secIoTAgent.setAgentServer(serverUrl);
+    }
+
+    public void configureFrpsIp() {
+        SharedPreferences sharedPref = getSharedPreferences("com.wrlus.seciot", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String frpsIp = sharedPref.getString("frps_ip", "Undefined");
+        if (frpsIp == null || frpsIp.equals("Undefined")) {
+            frpsIp = "140.143.53.29";
+            editor.putString("frps_ip", frpsIp);
+            editor.apply();
+        }
+        frpcAgent.setFrpsServer(frpsIp);
     }
 
     @Override
@@ -373,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void getFridaVersionOnServer() {
-        FridaServerAgent.getFridaVersionOnServer(new Callback() {
+        fridaServerAgent.getFridaVersionOnServer(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.GET_FRIDA_VERSION_FAILED, e);
@@ -402,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void getFrpsVersionOnServer() {
-        FrpcAgent.getFrpsVersionOnServer(new Callback() {
+        frpcAgent.getFrpsVersionOnServer(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.GET_FRP_VERSION_FAILED, e);
@@ -431,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void downloadFridaServer() {
-        FridaServerAgent.downloadFridaServer(fridaVersion, abi, new Callback() {
+        fridaServerAgent.downloadFridaServer(fridaVersion, abi, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_FAILED, e);
@@ -464,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void installFrida(File downloadFile) {
-        FridaServerAgent.installFridaServer(downloadFile, fridaVersion, new StatusCallback() {
+        fridaServerAgent.installFridaServer(downloadFile, fridaVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
@@ -494,17 +540,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void startFrida() {
-        FridaServerAgent.startFridaServer(fridaVersion);
+        fridaServerAgent.startFridaServer(fridaVersion);
         isFridaServerStarted = true;
     }
 
     public void stopFrida() {
-        FridaServerAgent.stopFridaServer();
+        fridaServerAgent.stopFridaServer();
         isFridaServerStarted = false;
     }
 
     public void removeFrida() {
-        FridaServerAgent.removeFridaServer(fridaVersion, new StatusCallback() {
+        fridaServerAgent.removeFridaServer(fridaVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
@@ -533,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void downloadFrpc() {
-        FrpcAgent.downloadFrp(frpVersion, abi, new Callback() {
+        frpcAgent.downloadFrp(frpVersion, abi, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRP_FAILED, e);
@@ -567,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void installFrpc(File downloadFile) {
-        FrpcAgent.installFrpc(downloadFile, frpVersion, new StatusCallback() {
+        frpcAgent.installFrpc(downloadFile, frpVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
@@ -602,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void realStartFrpc(int port) {
-        FrpcAgent.startFrpc(this, frpVersion, port);
+        frpcAgent.startFrpc(this, frpVersion, port);
         isFrpcStarted = true;
         updateDevice(true);
     }
@@ -612,13 +658,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void realStopFrpc() {
-        FrpcAgent.stopFrpc();
+        frpcAgent.stopFrpc();
         isFrpcStarted = false;
         updateDevice(false);
     }
 
     public void bindRemotePort() {
-        FrpcAgent.bindRemotePort(getClientId(), new Callback() {
+        frpcAgent.bindRemotePort(getClientId(), new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.BIND_REMOTE_PORT_FAILED, e);
@@ -647,7 +693,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void getRemotePort() {
-        FrpcAgent.getRemotePort(getClientId(), new Callback() {
+        frpcAgent.getRemotePort(getClientId(), new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.GET_REMOTE_PORT_FAILED, e);
@@ -676,7 +722,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void unBindRemotePort() {
-        FrpcAgent.unBindRemotePort(getClientId(), new Callback() {
+        frpcAgent.unBindRemotePort(getClientId(), new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.UNBIND_REMOTE_PORT_FAILED, e);
@@ -705,7 +751,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void removeFrpc() {
-        FrpcAgent.removeFrpc(frpVersion, new StatusCallback() {
+        frpcAgent.removeFrpc(frpVersion, new StatusCallback() {
             @Override
             public void onSuccess() {
                 runOnUiThread(new Runnable() {
@@ -734,7 +780,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void addDevice() {
-        SecIoTAgent.addDevice(getClientId(), port, new Callback() {
+        secIoTAgent.addDevice(getClientId(), port, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.ADD_DEVICE_FAILED, e);
@@ -763,7 +809,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     public void updateDevice(boolean isOnline) {
-        SecIoTAgent.updateDeviceStatus(getClientId(), port, isOnline, new Callback() {
+        secIoTAgent.updateDeviceStatus(getClientId(), port, isOnline, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Message msg = handler.obtainMessage(Msg.UPDATE_DEVICE_FAILED, e);

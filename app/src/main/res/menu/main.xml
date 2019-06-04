@@ -3,7 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/btnRefresh"
-        android:title="刷新"
+        android:title="@string/refresh"
         android:orderInCategory="100"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/btnSettings"
+        android:title="@string/settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/btnAbout"
+        android:title="@string/about"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

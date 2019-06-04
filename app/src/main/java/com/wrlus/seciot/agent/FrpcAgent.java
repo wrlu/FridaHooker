@@ -19,27 +19,45 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class FrpcAgent {
-    private static final String AGENT_SERVER_HOST = "192.168.43.7";
-    private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
-    private static final String FRP_DOWNLOAD_LINK = AGENT_SERVER + "/attach/downloads/frp/v${version}/";
-    private static final String FRP_NAME = "frp_${version}_linux_${abi}.tar.gz";
+    private static FrpcAgent instance;
+    private String FRPS_SERVER = "140.143.52.29";
+    private String AGENT_SERVER = "http://140.143.52.29:8080/SecIoT";
 
-    public static void getFrpsVersionOnServer(Callback callback) {
+    public static FrpcAgent getInstance() {
+        if (instance == null) {
+            synchronized (FrpcAgent.class) {
+                if (instance == null) {
+                    instance = new FrpcAgent();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void setAgentServer(String serverUrl) {
+        AGENT_SERVER = serverUrl;
+    }
+
+    public void setFrpsServer(String frpsServerIp) {
+        FRPS_SERVER = frpsServerIp;
+    }
+
+    public void getFrpsVersionOnServer(Callback callback) {
         String url = AGENT_SERVER + "/agent/frps-version";
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().get().url(url).build();
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void downloadFrp(String version, String abi, Callback callback) {
-        String url = FRP_DOWNLOAD_LINK.replace("${version}", version) +
-                FRP_NAME.replace("${version}", version).replace("${abi}", abi);
+    public void downloadFrp(String version, String abi, Callback callback) {
+        String url = AGENT_SERVER + "/attach/downloads/frp/v${version}/".replace("${version}", version) +
+                "frp_${version}_linux_${abi}.tar.gz".replace("${version}", version).replace("${abi}", abi);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().get().url(url).build();
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void installFrpc(final File downloadFile, final String version, final StatusCallback callback) {
+    public void installFrpc(final File downloadFile, final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frp/" + version + "/";
         final String[] cmds = {
                 "mkdir /data/local/tmp/seciot/",
@@ -88,7 +106,7 @@ public class FrpcAgent {
         thread.start();
     }
 
-    public static void bindRemotePort(String clientId, Callback callback) {
+    public void bindRemotePort(String clientId, Callback callback) {
         String url = AGENT_SERVER + "/agent/bind";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = new FormBody.Builder().add("client_id", clientId).build();
@@ -96,7 +114,7 @@ public class FrpcAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void getRemotePort(String clientId, Callback callback) {
+    public void getRemotePort(String clientId, Callback callback) {
         String url = AGENT_SERVER + "/agent/getbind";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = new FormBody.Builder().add("client_id", clientId).build();
@@ -104,7 +122,7 @@ public class FrpcAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void unBindRemotePort(String clientId, Callback callback) {
+    public void unBindRemotePort(String clientId, Callback callback) {
         String url = AGENT_SERVER + "/agent/unbind";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = new FormBody.Builder().add("client_id", clientId).build();
@@ -112,7 +130,7 @@ public class FrpcAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static boolean checkFrpcInstallation(String version) {
+    public boolean checkFrpcInstallation(String version) {
         String targetPath = "/data/local/tmp/seciot/frp/" + version + "/";
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("ls", targetPath + "frpc", targetPath + "frpc.ini");
@@ -134,7 +152,7 @@ public class FrpcAgent {
         return false;
     }
 
-    public static void removeFrpc(final String version, final StatusCallback callback) {
+    public void removeFrpc(final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frp/" + version + "/";
         final String[] cmds = {
                 "rm -rf " + targetPath
@@ -174,13 +192,13 @@ public class FrpcAgent {
         thread.start();
     }
 
-    public static void startFrpc(Context context, String version, int port) {
+    public void startFrpc(Context context, String version, int port) {
         try {
             File frpcIniFile = new File(context.getCacheDir().getAbsolutePath()
                     + "/frpc.ini");
             FileWriter fos = new FileWriter(frpcIniFile);
             fos.write("[common]\n");
-            fos.write("server_addr = "+AGENT_SERVER_HOST+"\n");
+            fos.write("server_addr = "+FRPS_SERVER+"\n");
             fos.write("server_port = 8082\n");
             fos.write("\n");
             fos.write("[tcp"+port+"]\n");
@@ -210,7 +228,7 @@ public class FrpcAgent {
         }
     }
 
-    public static void stopFrpc() {
+    public void stopFrpc() {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
             rootShellHelper.execute("kill -9 $(pidof frpc)");

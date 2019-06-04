@@ -9,10 +9,25 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class SecIoTAgent {
-    private static final String AGENT_SERVER_HOST = "192.168.43.7";
-    private static final String AGENT_SERVER = "http://"+AGENT_SERVER_HOST+":8080/SecIoT";
+    private static SecIoTAgent instance;
+    private String AGENT_SERVER = "http://140.143.52.29:8080/SecIoT";
 
-    public static void addDevice(String clientId, int port, Callback callback) {
+    public static SecIoTAgent getInstance() {
+        if (instance == null) {
+            synchronized (SecIoTAgent.class) {
+                if (instance == null) {
+                    instance = new SecIoTAgent();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void setAgentServer(String serverUrl) {
+        AGENT_SERVER = serverUrl;
+    }
+
+    public void addDevice(String clientId, int port, Callback callback) {
         String url = AGENT_SERVER + "/device/add";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = new FormBody.Builder()
@@ -28,7 +43,7 @@ public class SecIoTAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void updateDeviceStatus(String clientId, int port, boolean online, Callback callback) {
+    public void updateDeviceStatus(String clientId, int port, boolean online, Callback callback) {
         String url = AGENT_SERVER + "/device/update";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = new FormBody.Builder()
