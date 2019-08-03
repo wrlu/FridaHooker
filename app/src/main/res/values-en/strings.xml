@@ -13,11 +13,13 @@
     <string name="device_name">Device Name: %1$s</string>
     <string name="device_abi">Structure: %1$s</string>
     <string name="server_host">SecIoT Service: %1$s</string>
-    <string name="refresh">Refresh Agent State</string>
+    <string name="refresh">Refresh</string>
     <string name="settings">Global Preferences</string>
     <string name="about">About SecIoT Agent</string>
-    <string name="gplv2">"1.0-aosp\n\n This program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\nSee the GNU General Public License for more details.\n\nSource Code: https://gitlab.com/wrlu/seciot-agent-android"</string>
+    <string name="gplv2">1.1-aosp\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \nSource Code: https://gitlab.com/wrlu/seciot-agent-android</string>
     <string name="frps_ip">Frps Proxy: %1$s</string>
     <string name="reset">Reset</string>
     <string name="reset_client_id">Reset Client ID</string>
+    <string name="local_use">Enable Local Mode</string>
+    <string name="debug_mode">Show Debug Log</string>
 </resources>

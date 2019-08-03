@@ -3,8 +3,8 @@ package com.wrlus.seciot;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,13 +18,16 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnManageServerURL, btnManageFrpsIP, btnResetClientId;
     private String[] serverUrls = {
             "http://140.143.53.29:8080/SecIoT",
-            "http://172.16.0.1:8080/SecIoT",
-            "http://192.168.43.7:8080/SecIoT"
+            "http://192.168.1.118:8080/SecIoT",
+            "http://192.168.43.7:8080/SecIoT",
+            "https://140.143.53.29/SecIoT",
+            "https://iot.wrlu.cn/SecIoT"
     };
     private String[] frpsIps = {
             "140.143.53.29",
-            "172.16.0.1",
-            "192.168.43.7"
+            "192.168.1.118",
+            "192.168.43.7",
+            "iot.wrlu.cn"
     };
 
     @Override
@@ -105,6 +108,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("server_url", serverUrl);
                 editor.apply();
+                Toast.makeText(SettingsActivity.this, "保存成功", Toast.LENGTH_SHORT).show();
                 getServer();
             }
         });
@@ -122,6 +126,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("frps_ip", frpsIp);
                 editor.apply();
+                Toast.makeText(SettingsActivity.this, "保存成功", Toast.LENGTH_SHORT).show();
                 getFrpsIp();
             }
         });
@@ -134,7 +139,7 @@ public class SettingsActivity extends AppCompatActivity {
         String clientId = UUID.randomUUID().toString();
         editor.putString("client_id", clientId);
         editor.apply();
-        Toast.makeText(this, "重置客户端标识符成功", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "重置客户端ID成功", Toast.LENGTH_SHORT).show();
     }
 
 }
