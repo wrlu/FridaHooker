@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SecIoT 代理</string>
-    <string name="app_status">SecIoT 代理状态</string>
+    <string name="app_name" translatable="false">FridaHooker</string>
+    <string name="app_status">Frida 状态</string>
     <string name="frida_missing">frida server %1$s-%2$s 缺失</string>
     <string name="frida_ready">frida server %1$s-%2$s 就绪</string>
     <string name="frp_missing">frp client %1$s-%2$s 缺失</string>
@@ -14,8 +14,8 @@
     <string name="device_abi">体系结构: %1$s</string>
     <string name="server_host">SecIoT 服务: %1$s</string>
     <string name="refresh">刷新</string>
-    <string name="settings">全局配置</string>
-    <string name="about">关于 SecIoT 代理</string>
+    <string name="settings">配置设置</string>
+    <string name="about">关于 FridaHooker</string>
     <string name="gplv2">1.1-aosp\n\n本程序是自由软件，您可以根据由自由软件基金会出版 GNU 通用公共许可证第2版的条款和条件重新分发和/或修改它。\n发布本程序只是希望它对您有用，但不包含任何保证，甚至没有对适合特定用途的隐含保证。\n有关详细信息，请参阅 GNU 通用公共许可证。\n获取源代码: https://gitlab.com/wrlu/seciot-agent-android</string>
     <string name="frps_ip">Frps 代理: %1$s</string>
     <string name="reset">重置</string>

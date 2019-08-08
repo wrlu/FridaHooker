@@ -58,29 +58,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageStatus" />
 
-    <TextView
-        android:id="@+id/textViewFrpVersion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="28dp"
-        android:text="@string/frp_missing"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/btnFrpcManage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewFridaVersion" />
-
-    <Button
-        android:id="@+id/btnFrpcManage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="15dp"
-        android:text="@string/manage_module"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnFridaManage" />
-
     <ProgressBar
         android:id="@+id/progressBarFridaInstall"
         style="?android:attr/progressBarStyleHorizontal"
@@ -93,31 +70,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewFridaVersion" />
 
-    <ProgressBar
-        android:id="@+id/progressBarFrpInstall"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:max="100"
-        android:progress="0"
-        app:layout_constraintEnd_toStartOf="@+id/btnFrpcManage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewFrpVersion" />
-
     <TextView
         android:id="@+id/textViewAndroidVer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="15dp"
         android:text="@string/android_ver"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnFrpcManage" />
+        app:layout_constraintTop_toBottomOf="@+id/btnFridaManage" />
 
     <TextView
         android:id="@+id/textViewDeviceName"
