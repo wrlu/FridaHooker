@@ -73,6 +73,20 @@ public class FridaServerAgent {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
+    public File extractXZ(InputStream source, String target) throws IOException {
+        XZInputStream xzis = new XZInputStream(source);
+        FileOutputStream fos = new FileOutputStream(target);
+        int len;
+        byte[] buffer = new byte[4096];
+        while (-1 != (len = xzis.read(buffer))) {
+            fos.write(buffer, 0, len);
+            fos.flush();
+        }
+        xzis.close();
+        fos.close();
+        return new File(target);
+    }
+
     public void installFrida(final File installFile, final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
         final String[] cmds = {
@@ -89,20 +103,6 @@ public class FridaServerAgent {
         } catch (IOException e) {
             callback.onFailure(-1, e);
         }
-    }
-
-    public File extractXZ(InputStream source, String target) throws IOException {
-        XZInputStream xzis = new XZInputStream(source);
-        FileOutputStream fos = new FileOutputStream(target);
-        int len;
-        byte[] buffer = new byte[4096];
-        while (-1 != (len = xzis.read(buffer))) {
-            fos.write(buffer, 0, len);
-            fos.flush();
-        }
-        xzis.close();
-        fos.close();
-        return new File(target);
     }
 
     public void removeFrida(final String version, final StatusCallback callback) {
