@@ -4,8 +4,11 @@ import android.util.Log;
 
 import com.wrlus.fridahooker.util.RootShellHelper;
 
+import org.tukaani.xz.XZInputStream;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -88,6 +91,19 @@ public class FridaServerAgent {
         }
     }
 
+    public File extractXZ(InputStream source, String target) throws IOException {
+        XZInputStream xzis = new XZInputStream(source);
+        FileOutputStream fos = new FileOutputStream(target);
+        int len;
+        byte[] buffer = new byte[4096];
+        while (-1 != (len = xzis.read(buffer))) {
+            fos.write(buffer, 0, len);
+            fos.flush();
+        }
+        xzis.close();
+        fos.close();
+        return new File(target);
+    }
 
     public void removeFrida(final String version, final StatusCallback callback) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";

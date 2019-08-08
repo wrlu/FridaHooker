@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 isRemoteFridaAvaliable = false;
                 fridaVersion = localFridaVersion;
                 Log.d(TAG, "Local frida version: " + fridaVersion);
-                Toast.makeText(MainActivity.this, "无法获得服务器frida版本，使用本地资源。", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "无法获取远程frida版本，使用本地资源。", Toast.LENGTH_SHORT).show();
                 checkFridaInstallation();
                 break;
             case Msg.DOWNLOAD_FRIDA_SUCCESS:
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful() && response.body() != null) {
-                    File targetFile = extractXZ(response.body().byteStream(), MainActivity.this.getCacheDir().getAbsolutePath()
+                    File targetFile = fridaServerAgent.extractXZ(response.body().byteStream(), MainActivity.this.getCacheDir().getAbsolutePath()
                             + "/frida-server-"+fridaVersion+"-android-"+abi);
                     Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_SUCCESS, targetFile);
                     handler.sendMessage(msg);
@@ -315,32 +315,26 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     protected void getLocalFrida() {
-        String filename = "frida-server-" + fridaVersion + "-android-" + abi + ".xz";
-        AssetManager assetManager = getAssets();
-        try {
-            File targetFile = extractXZ(assetManager.open(filename), MainActivity.this.getCacheDir().getAbsolutePath()
-                    + "/frida-server-"+fridaVersion+"-android-"+abi);
-            Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_SUCCESS, targetFile);
-            handler.sendMessage(msg);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_FAILED);
-            handler.sendMessage(msg);
-        }
-    }
-
-    protected File extractXZ(InputStream source, String target) throws IOException {
-        XZInputStream xzis = new XZInputStream(source);
-        FileOutputStream fos = new FileOutputStream(target);
-        int len;
-        byte[] buffer = new byte[4096];
-        while (-1 != (len = xzis.read(buffer))) {
-            fos.write(buffer, 0, len);
-            fos.flush();
-        }
-        xzis.close();
-        fos.close();
-        return new File(target);
+        final String filename = "frida-server-" + fridaVersion + "-android-" + abi + ".xz";
+        final AssetManager assetManager = getAssets();
+        Thread extractThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    File targetFile = fridaServerAgent.extractXZ(assetManager.open(filename), MainActivity.this.getCacheDir().getAbsolutePath()
+                            + "/frida-server-"+fridaVersion+"-android-"+abi);
+                    Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_SUCCESS, targetFile);
+                    handler.sendMessage(msg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_FAILED);
+                    handler.sendMessage(msg);
+                }
+            }
+        });
+        extractThread.setDaemon(true);
+        extractThread.setName("Thread-ExtractXZ");
+        extractThread.start();
     }
 
     protected void installFrida(File downloadFile) {
