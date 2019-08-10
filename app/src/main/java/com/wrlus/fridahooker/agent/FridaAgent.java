@@ -17,19 +17,19 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-public class FridaServerAgent {
-    private static FridaServerAgent instance;
+public class FridaAgent {
+    private static FridaAgent instance;
     private String FRIDA_CENTER = "https://github.com/frida/frida/releases/download";
 
-    private FridaServerAgent() {
-        Log.d("FridaServerAgent", "Create FridaServerAgent singleton");
+    private FridaAgent() {
+        Log.d("FridaAgent", "Create FridaAgent singleton");
     }
 
-    public static FridaServerAgent getInstance() {
+    public static FridaAgent getInstance() {
         if (instance == null) {
-            synchronized (FridaServerAgent.class) {
+            synchronized (FridaAgent.class) {
                 if (instance == null) {
-                    instance = new FridaServerAgent();
+                    instance = new FridaAgent();
                 }
             }
         }
@@ -98,7 +98,6 @@ public class FridaServerAgent {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
             rootShellHelper.execute(cmds);
-            rootShellHelper.exit();
             callback.onSuccess();
         } catch (IOException e) {
             callback.onFailure(-1, e);
@@ -113,7 +112,6 @@ public class FridaServerAgent {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
             rootShellHelper.execute(cmds);
-            rootShellHelper.exit();
             callback.onSuccess();
         } catch (IOException e) {
             callback.onFailure(-1, e);
@@ -139,7 +137,6 @@ public class FridaServerAgent {
         RootShellHelper rootShellHelper = RootShellHelper.getInstance();
         try {
             rootShellHelper.execute("kill -9 $(pidof frida-server)");
-            rootShellHelper.exit();
         } catch (IOException e) {
             e.printStackTrace();
         }

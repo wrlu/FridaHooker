@@ -86,6 +86,10 @@ public class RootShellHelper {
         os.flush();
     }
 
+    public synchronized void waitFor() throws InterruptedException {
+        process.waitFor();
+    }
+
     public synchronized void exit() throws IOException {
         if (!isRunning) {
             return;

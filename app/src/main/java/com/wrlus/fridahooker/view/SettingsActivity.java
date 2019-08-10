@@ -1,10 +1,12 @@
-package com.wrlus.fridahooker;
+package com.wrlus.fridahooker.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import com.wrlus.fridahooker.R;
 
 import java.util.UUID;
 
