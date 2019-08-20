@@ -8,3 +8,6 @@
 
 ## 环境配置
 - 系统要求：Android 5.0或更高版本，需要应用具有root权限。
+
+## 截图
+<img src="img/demo.png" />
