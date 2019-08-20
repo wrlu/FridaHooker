@@ -6,30 +6,15 @@ import android.widget.Toast;
 
 public class LogUtil {
     private static final String TAG = "LogUtil";
-    private static LogUtil instance = null;
+    private static boolean isDebuggable = true;
 
-    private boolean isDebuggable = true;
-    private LogUtil() {
-        Log.d(TAG, "Create LogUtil singleton");
-    }
-    public static LogUtil getInstance() {
-        if (instance == null) {
-            synchronized (LogUtil.class) {
-                if (instance == null) {
-                    instance = new LogUtil();
-                }
-            }
-        }
-        return instance;
-    }
-
-    public void setDebuggable(boolean debuggable) {
+    public static void setDebuggable(boolean debuggable) {
         isDebuggable = debuggable;
     }
 
-    public void debug(String tag, String msg) {
+    public static void d(String tag, String msg) {
         if (tag == null || msg == null) {
-            error(TAG, "debug(): parameter is null");
+            LogUtil.e(TAG, "debug(): parameter is null");
             return;
         }
         if (isDebuggable) {
@@ -37,33 +22,33 @@ public class LogUtil {
         }
     }
 
-    public void info(String tag, String msg) {
+    public static void i(String tag, String msg) {
         if (tag == null || msg == null) {
-            error(TAG, "info(): parameter is null");
+            LogUtil.e(TAG, "info(): parameter is null");
             return;
         }
         Log.i(tag, msg);
     }
 
-    public void warn(String tag, String msg) {
+    public static void w(String tag, String msg) {
         if (tag == null || msg == null) {
-            error(TAG, "warn(): parameter is null");
+            LogUtil.e(TAG, "warn(): parameter is null");
             return;
         }
         Log.w(tag, msg);
     }
 
-    public void error(String tag, String msg) {
+    public static void e(String tag, String msg) {
         if (tag == null || msg == null) {
-            error(TAG, "error(): parameter is null");
+            LogUtil.e(TAG, "error(): parameter is null");
             return;
         }
         Log.e(tag, msg);
     }
 
-    public void error(String tag, Throwable e) {
+    public static void e(String tag, Throwable e) {
         if (tag == null || e == null) {
-            error(TAG, "error(): parameter is null");
+            LogUtil.e(TAG, "error(): parameter is null");
             return;
         }
         Log.e(tag, e.getClass().getName());
@@ -72,9 +57,9 @@ public class LogUtil {
         }
     }
 
-    public void toast(Context context, String msg, Object details) {
+    public static void t(Context context, String msg, Object details) {
         if (msg == null) {
-            error(TAG, "toast(): parameter is null");
+            LogUtil.e(TAG, "toast(): parameter is null");
             return;
         }
         String text = msg;

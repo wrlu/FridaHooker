@@ -1,5 +1,6 @@
 package com.wrlus.fridahooker.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,14 +29,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wrlus.fridahooker.ProgressCallback;
 import com.wrlus.fridahooker.R;
 import com.wrlus.fridahooker.agent.FridaAgent;
 import com.wrlus.fridahooker.agent.StatusCallback;
 import com.wrlus.fridahooker.msg.Msg;
 import com.wrlus.fridahooker.util.DeviceHelper;
 import com.wrlus.fridahooker.util.LogUtil;
-import com.wrlus.fridahooker.util.RootShellHelper;
+import com.wrlus.fridahooker.util.RootShell;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,9 +49,9 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
-    private static final String localFridaVersion = "12.6.11";
+    private static final String localFridaVersion = "12.6.14";
     private String abi = "Unknown";
-    private String fridaVersion = "Unknown";
+    private String fridaVersion = localFridaVersion;
     private boolean isRemoteFridaAvaliable = false;
     private boolean isProductSupported = false;
     private boolean isFridaServerInstalled = false;
@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private final Handler handler = new Handler(this);
     private final FridaAgent fridaAgent = FridaAgent.getInstance();
-    private final LogUtil log = LogUtil.getInstance();
 
     private Switch switchStatus;
     private ImageView imageStatus;
@@ -70,9 +69,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bindWidget();
-        bindWidgetEvent();
-        getSystemInfo();
+        initUi();
+        checkFridaInstallation();
+        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (checkPermission(Manifest.permission.READ_PHONE_STATE)) {
+            getSystemInfo();
+        }
         getRemoteFridaVersion();
     }
 
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         if (item.getItemId() == R.id.btnRefresh) {
             getRemoteFridaVersion();
         } else if (item.getItemId() == R.id.btnSettings) {
-            log.debug(TAG, "准备进入设置页面");
+            LogUtil.d(TAG, "准备进入设置页面");
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         } else if (item.getItemId() == R.id.btnAbout) {
@@ -115,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        RootShell rootShell = RootShell.getInstance();
         try {
-            rootShellHelper.exit();
+            rootShell.exit();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,14 +132,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             case Msg.GET_FRIDA_VERSION_SUCCESS:
                 isRemoteFridaAvaliable = true;
                 fridaVersion = (String) msg.obj;
-                log.debug(TAG, "Remote frida version: " + fridaVersion);
+                LogUtil.d(TAG, "Remote frida version: " + fridaVersion);
                 checkFridaInstallation();
                 break;
             case Msg.GET_FRIDA_VERSION_FAILED:
                 isRemoteFridaAvaliable = false;
                 fridaVersion = localFridaVersion;
-                log.debug(TAG, "Local frida version: " + fridaVersion);
-                log.toast(this, "无法获取远程frida版本，使用本地资源。", msg.obj);
+                LogUtil.d(TAG, "Local frida version: " + fridaVersion);
+                LogUtil.t(this, "无法获取远程frida版本，使用本地资源。", msg.obj);
                 checkFridaInstallation();
                 break;
             case Msg.DOWNLOAD_FRIDA_SUCCESS:
@@ -145,16 +147,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 installFrida((File) msg.obj);
                 break;
             case Msg.DOWNLOAD_FRIDA_FAILED:
-                log.toast(this, "无法获取frida server压缩包。", msg.obj);
+                LogUtil.t(this, "无法获取frida server压缩包。", msg.obj);
                 break;
             default:
-                log.error(TAG, "Receive odd message: "+msg.what);
+                LogUtil.e(TAG, "Receive odd message: "+msg.what);
                 break;
         }
         return true;
     }
 
-    protected void bindWidget() {
+    protected void initUi() {
         switchStatus = findViewById(R.id.switchStatus);
         imageStatus = findViewById(R.id.imageStatus);
         textViewFridaVersion = findViewById(R.id.textViewFridaVersion);
@@ -163,9 +165,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         textViewStructure = findViewById(R.id.textViewStructure);
         btnFridaManage = findViewById(R.id.btnFridaManage);
         imageStatus.setImageResource(R.mipmap.status_error);
-    }
-
-    protected void bindWidgetEvent() {
         switchStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -192,16 +191,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     return;
                 }
                 List<String> manageFridaAction = new ArrayList<>();
+                manageFridaAction.add("从本地安装 frida server "+fridaVersion+"-"+abi);
                 if (isRemoteFridaAvaliable) {
                     manageFridaAction.add("从服务器安装 frida server "+fridaVersion+"-"+abi);
-                    if (isFridaServerInstalled) {
-                        manageFridaAction.add("卸载 frida server "+fridaVersion+"-"+abi);
-                    }
-                } else {
-                    manageFridaAction.add("从本地安装 frida server "+fridaVersion+"-"+abi);
-                    if (isFridaServerInstalled) {
-                        manageFridaAction.add("卸载 frida server "+fridaVersion+"-"+abi);
-                    }
+                }
+                if (isFridaServerInstalled) {
+                    manageFridaAction.add("卸载 frida server "+fridaVersion+"-"+abi);
                 }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("管理 frida server");
@@ -210,13 +205,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                if (isRemoteFridaAvaliable) {
-                                    downloadFrida();
-                                } else {
-                                    getLocalFrida();
-                                }
+                                getLocalFrida();
                                 break;
                             case 1:
+                                downloadFrida();
+                                break;
+                            case 2:
                                 removeFrida();
                                 break;
                             default:
@@ -254,11 +248,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             this.abi = "x86 (Unsupported)";
             isProductSupported = false;
         } else {
-            log.toast(this, "暂不支持此设备", "Unsupport ABI = "+abi);
+            LogUtil.t(this, "暂不支持此设备", "Unsupport ABI = "+abi);
         }
-        log.debug(TAG, "系统版本："+androidVerString);
-        log.debug(TAG, "设备名称："+deviceNameString);
-        log.debug(TAG, "体系结构："+deviceAbiString);
+        LogUtil.d(TAG, "系统版本："+androidVerString);
+        LogUtil.d(TAG, "设备名称："+deviceNameString);
+        LogUtil.d(TAG, "体系结构："+deviceAbiString);
     }
 
     protected void checkFridaInstallation() {
@@ -311,9 +305,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful() && response.body() != null) {
-                    File targetFile = fridaAgent.extractXZ(response.body().byteStream(), MainActivity.this.getCacheDir().getAbsolutePath()
+                    File targetFile = fridaAgent.extractXZ(response.body().byteStream(), getExternalCacheDir().getAbsolutePath()
                             + "/frida-server-"+fridaVersion+"-android-"+abi);
-                    log.debug(TAG, "Download frida file path: "+targetFile.getAbsolutePath());
+                    LogUtil.d(TAG, "Download frida file path: "+targetFile.getAbsolutePath());
                     Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_SUCCESS, targetFile);
                     handler.sendMessage(msg);
                 } else {
@@ -327,24 +321,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void getLocalFrida() {
         final String filename = "frida-server-" + fridaVersion + "-android-" + abi + ".xz";
         final AssetManager assetManager = getAssets();
-        Thread extractThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File targetFile = fridaAgent.extractXZ(assetManager.open(filename), MainActivity.this.getCacheDir().getAbsolutePath()
-                            + "/frida-server-"+fridaVersion+"-android-"+abi);
-                    log.debug(TAG, "Local frida file path: "+targetFile.getAbsolutePath());
-                    Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_SUCCESS, targetFile);
-                    handler.sendMessage(msg);
-                } catch (IOException e) {
-                    Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_FAILED, e);
-                    handler.sendMessage(msg);
-                }
-            }
-        });
-        extractThread.setDaemon(true);
-        extractThread.setName("Thread-ExtractXZ");
-        extractThread.start();
+        try {
+            File targetFile = fridaAgent.extractXZ(assetManager.open(filename), getExternalCacheDir().getAbsolutePath()
+                    + "/frida-server-"+fridaVersion+"-android-"+abi);
+            LogUtil.d(TAG, "Local frida file path: "+targetFile.getAbsolutePath());
+            Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_SUCCESS, targetFile);
+            handler.sendMessage(msg);
+        } catch (IOException e) {
+            Message msg = handler.obtainMessage(Msg.DOWNLOAD_FRIDA_FAILED, e);
+            handler.sendMessage(msg);
+        }
     }
 
     protected void installFrida(File downloadFile) {
@@ -402,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onFailure(int exitCode, Exception e) {
-                log.error(TAG, "Remove frida server failed, exit code "+exitCode);
+                LogUtil.d(TAG, "Remove frida server failed, exit code "+exitCode);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -446,10 +432,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         permission) ==
                         PackageManager.PERMISSION_GRANTED;
 
-        if (permissionAccessApproved) {
-
-        } else {
-            ActivityCompat.requestPermissions(this, new String[] {
+        if (!permissionAccessApproved) {
+            ActivityCompat.requestPermissions(this, new String[]{
                     permission
             }, 0);
         }
@@ -460,9 +444,22 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            log.debug(TAG, permissions[0] + " Approved.");
+            LogUtil.d(TAG, permissions[0] + " Approved.");
+            if (permissions[0].equals(Manifest.permission.READ_PHONE_STATE)) {
+                getSystemInfo();
+            }
         } else {
-            log.debug(TAG, permissions[0] + " Denied.");
+            LogUtil.d(TAG, permissions[0] + " Denied.");
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle(R.string.need_permissions);
+            dialog.setMessage(R.string.need_permissions_content);
+            dialog.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    System.exit(0);
+                }
+            });
+            dialog.show();
         }
     }
 }

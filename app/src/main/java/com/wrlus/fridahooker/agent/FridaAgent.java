@@ -2,7 +2,9 @@ package com.wrlus.fridahooker.agent;
 
 import android.util.Log;
 
-import com.wrlus.fridahooker.util.RootShellHelper;
+import com.wrlus.fridahooker.util.LogUtil;
+import com.wrlus.fridahooker.util.NativeRootShell;
+import com.wrlus.fridahooker.util.RootShell;
 
 import org.tukaani.xz.XZInputStream;
 
@@ -18,6 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class FridaAgent {
+    private static final String TAG = "FridaAgent";
     private static FridaAgent instance;
     private String FRIDA_CENTER = "https://github.com/frida/frida/releases/download";
 
@@ -45,24 +48,9 @@ public class FridaAgent {
 
     public boolean checkFridaInstallation(String version) {
         String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder("ls", targetPath + "frida-server");
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            BufferedReader bs = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            process.waitFor();
-            String line;
-            while ((line = bs.readLine()) != null) {
-                Log.i("FridaInstallationCheck", line);
-            }
-            if (process.exitValue() == 0) {
-                return true;
-            }
-            Log.e("FridaInstallationCheck", String.valueOf(process.exitValue()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+        int code = NativeRootShell.execute("ls " + targetPath + "frida-server");
+        LogUtil.d(TAG, "checkFridaInstallation exit with code "+code);
+        return 0 == code;
     }
 
     public void downloadFrida(String version, String abi, Callback callback) {
@@ -70,6 +58,7 @@ public class FridaAgent {
                 "frida-server-${version}-android-${abi}.xz".replace("${version}", version).replace("${abi}", abi);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
+        LogUtil.d(TAG, url);
         okHttpClient.newCall(request).enqueue(callback);
     }
 
@@ -84,6 +73,7 @@ public class FridaAgent {
         }
         xzis.close();
         fos.close();
+        LogUtil.d(TAG, "Target: " + target);
         return new File(target);
     }
 
@@ -95,11 +85,12 @@ public class FridaAgent {
                 "cd " + targetPath,
                 "mv " + installFile.getName() + " frida-server",
         };
-        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        RootShell rootShell = RootShell.getInstance();
         try {
-            rootShellHelper.execute(cmds);
+            rootShell.execute(cmds);
             callback.onSuccess();
         } catch (IOException e) {
+            LogUtil.e(TAG, e);
             callback.onFailure(-1, e);
         }
     }
@@ -109,11 +100,12 @@ public class FridaAgent {
         final String[] cmds = {
                 "rm -rf " + targetPath
         };
-        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        RootShell rootShell = RootShell.getInstance();
         try {
-            rootShellHelper.execute(cmds);
+            rootShell.execute(cmds);
             callback.onSuccess();
         } catch (IOException e) {
+            LogUtil.e(TAG, e);
             callback.onFailure(-1, e);
         }
     }
@@ -125,20 +117,20 @@ public class FridaAgent {
                 "chmod +x frida-server",
                 "./frida-server &"
         };
-        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        RootShell rootShell = RootShell.getInstance();
         try {
-            rootShellHelper.execute(cmds);
+            rootShell.execute(cmds);
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.e(TAG, e);
         }
     }
 
     public void stopFrida() {
-        RootShellHelper rootShellHelper = RootShellHelper.getInstance();
+        RootShell rootShell = RootShell.getInstance();
         try {
-            rootShellHelper.execute("kill -9 $(pidof frida-server)");
+            rootShell.execute("kill -9 $(pidof frida-server)");
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.e(TAG, e);
         }
     }
 }
