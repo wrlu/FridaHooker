@@ -15,7 +15,7 @@
     <string name="refresh">Refresh</string>
     <string name="settings">Preferences</string>
     <string name="about">About FridaHooker</string>
-    <string name="gplv2">1.3-12.6.16-aosp\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \n\nSource Code: https://gitlab.com/wrlu/seciot-agent-android</string>
+    <string name="gplv2">1.3-12.6.14-aosp\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \n\nSource Code: https://gitlab.com/wrlu/seciot-agent-android</string>
     <string name="frps_ip">Frps Proxy: %1$s</string>
     <string name="reset">Reset</string>
     <string name="reset_client_id">Reset Client ID</string>
