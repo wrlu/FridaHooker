@@ -1,0 +1,3 @@
+C:/Users/wrlu/OneDrive/Repos/AndroidRepos/seciot-agent-android/app/.cxx/cmake/release/x86/CMakeFiles/seciot.dir
+C:/Users/wrlu/OneDrive/Repos/AndroidRepos/seciot-agent-android/app/.cxx/cmake/release/x86/CMakeFiles/edit_cache.dir
+C:/Users/wrlu/OneDrive/Repos/AndroidRepos/seciot-agent-android/app/.cxx/cmake/release/x86/CMakeFiles/rebuild_cache.dir

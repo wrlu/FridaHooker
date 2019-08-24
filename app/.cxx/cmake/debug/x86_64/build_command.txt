@@ -1,0 +1,20 @@
+Executable : C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\cmake.exe
+arguments : 
+-HC:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\src\main\cpp
+-BC:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\.cxx\cmake\debug\x86_64
+-DANDROID_ABI=x86_64
+-DANDROID_PLATFORM=android-21
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\build\intermediates\cmake\debug\obj\x86_64
+-DCMAKE_BUILD_TYPE=Debug
+-DANDROID_NDK=C:\Users\wrlu\Android\sdk\ndk-bundle
+-DCMAKE_CXX_FLAGS=
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_ANDROID_ARCH_ABI=x86_64
+-DCMAKE_SYSTEM_VERSION=21
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_ANDROID_NDK=C:\Users\wrlu\Android\sdk\ndk-bundle
+-DCMAKE_TOOLCHAIN_FILE=C:\Users\wrlu\Android\sdk\ndk-bundle\build\cmake\android.toolchain.cmake
+-G Ninja
+-DCMAKE_MAKE_PROGRAM=C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\ninja.exe
+jvmArgs : 
+

@@ -1,0 +1,19 @@
+{
+  "buildFiles": [
+    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
+    "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" clean"
+  ],
+  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "seciot-Debug-armeabi-v7a": {
+      "artifactName": "seciot",
+      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" seciot",
+      "abi": "armeabi-v7a",
+      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\debug\\obj\\armeabi-v7a\\libseciot.so"
+    }
+  }
+}
