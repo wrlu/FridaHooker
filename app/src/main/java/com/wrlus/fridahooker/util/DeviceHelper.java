@@ -38,7 +38,7 @@ public class DeviceHelper {
     }
 
     public static String getProductName() {
-        return Build.MANUFACTURER + " " + Build.PRODUCT + " ( "+ Build.DEVICE +" )";
+        return Build.MANUFACTURER + " " + Build.MODEL + " ( "+ Build.DEVICE +" )";
     }
 
     public static String getAndroidVersion() {
