@@ -1,2 +1,2 @@
-ninja: Entering directory `C:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\.cxx\cmake\debug\arm64-v8a'
+ninja: Entering directory `/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/debug/arm64-v8a'
 ninja: no work to do.

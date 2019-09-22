@@ -1,65 +1,67 @@
 package com.wrlus.fridahooker.agent;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.wrlus.fridahooker.util.LogUtil;
 import com.wrlus.fridahooker.util.NativeRootShell;
-import com.wrlus.fridahooker.util.RootShell;
 
 import org.tukaani.xz.XZInputStream;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import java.net.ServerSocket;
 
 public class FridaAgent {
     private static final String TAG = "FridaAgent";
     private static FridaAgent instance;
-    private String FRIDA_CENTER = "https://github.com/frida/frida/releases/download";
+    private Context context;
 
-    private FridaAgent() {
+    private FridaAgent(Context context) {
+        this.context = context;
         Log.d("FridaAgent", "Create FridaAgent singleton");
     }
 
-    public static FridaAgent getInstance() {
+    public static FridaAgent getInstance(Context context) {
         if (instance == null) {
             synchronized (FridaAgent.class) {
                 if (instance == null) {
-                    instance = new FridaAgent();
+                    instance = new FridaAgent(context);
                 }
             }
         }
         return instance;
     }
 
-    public void getRemoteFridaVersion(Callback callback) {
-        String url = FRIDA_CENTER + "/agent/frida-version";
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().get().url(url).build();
-        okHttpClient.newCall(request).enqueue(callback);
-    }
-
     public boolean checkFridaInstallation(String version) {
-        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
-        int code = NativeRootShell.execute("ls " + targetPath + "frida-server");
+        String targetPath = context.getFilesDir().getAbsolutePath() + "/frida/"+version+"/";
+        int code = NativeRootShell.execute("ls " + targetPath + "frida-server*");
         LogUtil.d(TAG, "checkFridaInstallation exit with code "+code);
         return 0 == code;
     }
 
-    public void downloadFrida(String version, String abi, Callback callback) {
-        String url = FRIDA_CENTER + "/attach/downloads/frida/${version}/".replace("${version}", version) +
-                "frida-server-${version}-android-${abi}.xz".replace("${version}", version).replace("${abi}", abi);
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(url).build();
-        LogUtil.d(TAG, url);
-        okHttpClient.newCall(request).enqueue(callback);
+    public void checkFridaRunning(StatusCallback callback) {
+        Thread checkFridaThread = new Thread(()->{
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                ServerSocket serverSocket = new ServerSocket(27042);
+                serverSocket.close();
+                LogUtil.d(TAG, "checkFridaRunning try to bind tcp:27042 success, frida is not running.");
+                callback.onFailure(null);
+            } catch (IOException e) {
+                LogUtil.d(TAG, "checkFridaRunning try to bind tcp:27042 but failed, frida is still running.");
+                callback.onSuccess();
+            }
+        });
+        checkFridaThread.setDaemon(true);
+        checkFridaThread.setName("Thread-checkFrida");
+        checkFridaThread.start();
     }
 
     public File extractXZ(InputStream source, String target) throws IOException {
@@ -77,60 +79,56 @@ public class FridaAgent {
         return new File(target);
     }
 
-    public void installFrida(final File installFile, final String version, final StatusCallback callback) {
-        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
+    public boolean installFrida(File installFile, String version) {
+        String targetPath = context.getFilesDir().getAbsolutePath() + "/frida/"+version+"/";
         final String[] cmds = {
                 "mkdir -p " + targetPath,
-                "mv " + installFile.getAbsolutePath() + " " + targetPath,
-                "cd " + targetPath,
-                "mv " + installFile.getName() + " frida-server",
+                "mv " + installFile.getAbsolutePath() + " " + targetPath
         };
-        RootShell rootShell = RootShell.getInstance();
-        try {
-            rootShell.execute(cmds);
-            callback.onSuccess();
-        } catch (IOException e) {
-            LogUtil.e(TAG, e);
-            callback.onFailure(-1, e);
+        for (String cmd : cmds) {
+            int code = NativeRootShell.execute(cmd);
+            LogUtil.d(TAG, "installFrida `"+cmd+"` command exit with code "+code);
+            if (0 != code) {
+                return false;
+            }
         }
+        return true;
     }
 
-    public void removeFrida(final String version, final StatusCallback callback) {
-        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
-        final String[] cmds = {
-                "rm -rf " + targetPath
-        };
-        RootShell rootShell = RootShell.getInstance();
-        try {
-            rootShell.execute(cmds);
-            callback.onSuccess();
-        } catch (IOException e) {
-            LogUtil.e(TAG, e);
-            callback.onFailure(-1, e);
-        }
+    public boolean removeFrida(String version) {
+        String targetPath = context.getFilesDir().getAbsolutePath() + "/frida/"+version+"/";
+        int code = NativeRootShell.execute("rm -rf " + targetPath);
+        LogUtil.d(TAG, "removeFrida exit with code "+code);
+        return 0 == code;
     }
 
-    public void startFrida(String version) {
-        String targetPath = "/data/local/tmp/seciot/frida/" + version + "/";
+    public boolean startFrida(String version) {
+        String targetPath = context.getFilesDir().getAbsolutePath() + "/frida/"+version+"/";
         String[] cmds = {
-                "cd "+targetPath,
-                "chmod +x frida-server",
-                "./frida-server &"
+                "chmod +x " + targetPath + "frida-server*",
+                "su -c " + targetPath + "frida-server*  &",
         };
-        RootShell rootShell = RootShell.getInstance();
-        try {
-            rootShell.execute(cmds);
-        } catch (IOException e) {
-            LogUtil.e(TAG, e);
+        for (String cmd : cmds) {
+            int code = NativeRootShell.execute(cmd);
+            LogUtil.d(TAG, "startFrida `"+cmd+"` command exit with code "+code);
+            if (0 != code) {
+                return false;
+            }
         }
+        return true;
     }
 
-    public void stopFrida() {
-        RootShell rootShell = RootShell.getInstance();
-        try {
-            rootShell.execute("kill -9 $(pidof frida-server)");
-        } catch (IOException e) {
-            LogUtil.e(TAG, e);
+    public boolean stopFrida(String version, String abi) {
+        String[] cmds = {
+                "su -c kill -9 $(su -c pidof frida-server-"+version+"-android-"+abi+") &",
+        };
+        for (String cmd : cmds) {
+            int code = NativeRootShell.execute(cmd);
+            LogUtil.d(TAG, "stopFrida `"+cmd+"` command exit with code "+code);
+            if (0 != code) {
+                return false;
+            }
         }
+        return true;
     }
 }

@@ -1,3 +1,5 @@
 # ninja log v5
-1	513	588339374	CMakeFiles/seciot.dir/seciot.cpp.o	aa57a559c5862693
-516	643	588339374	C:/Users/wrlu/OneDrive/Repos/AndroidRepos/seciot-agent-android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libseciot.so	df1c45fe76e834eb
+0	226	1568280674	CMakeFiles/seciot.dir/seciot.cpp.o	559eab8d4542f9ef
+226	248	1568280674	/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libseciot.so	3755e926297be38a
+1	259	1569052127	CMakeFiles/seciot.dir/seciot.cpp.o	559eab8d4542f9ef
+259	289	1569052127	/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libseciot.so	3755e926297be38a
