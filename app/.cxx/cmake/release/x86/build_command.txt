@@ -1,10 +1,10 @@
 Executable : C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\cmake.exe
 arguments : 
--HC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\src\main\cpp
--BC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\.cxx\cmake\release\x86
+-HC:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\src\main\cpp
+-BC:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\.cxx\cmake\release\x86
 -DANDROID_ABI=x86
 -DANDROID_PLATFORM=android-21
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\build\intermediates\cmake\release\obj\x86
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\build\intermediates\cmake\release\obj\x86
 -DCMAKE_BUILD_TYPE=Release
 -DANDROID_NDK=C:\Users\wrlu\Android\sdk\ndk-bundle
 -DCMAKE_CXX_FLAGS=

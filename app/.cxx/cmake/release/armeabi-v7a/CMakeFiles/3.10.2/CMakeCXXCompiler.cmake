@@ -1,4 +1,4 @@
-set(CMAKE_CXX_COMPILER "C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe")
+set(CMAKE_CXX_COMPILER "C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe")
 set(CMAKE_CXX_COMPILER_ARG1 "")
 set(CMAKE_CXX_COMPILER_ID "Clang")
 set(CMAKE_CXX_COMPILER_VERSION "8.0")
@@ -17,11 +17,11 @@ set(CMAKE_CXX_SIMULATE_VERSION "")
 
 
 
-set(CMAKE_AR "C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ar.exe")
+set(CMAKE_AR "C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ar.exe")
 set(CMAKE_CXX_COMPILER_AR "CMAKE_CXX_COMPILER_AR-NOTFOUND")
-set(CMAKE_RANLIB "C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ranlib.exe")
+set(CMAKE_RANLIB "C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ranlib.exe")
 set(CMAKE_CXX_COMPILER_RANLIB "CMAKE_CXX_COMPILER_RANLIB-NOTFOUND")
-set(CMAKE_LINKER "C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ld.exe")
+set(CMAKE_LINKER "C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ld.exe")
 set(CMAKE_COMPILER_IS_GNUCXX )
 set(CMAKE_CXX_COMPILER_LOADED 1)
 set(CMAKE_CXX_COMPILER_WORKS TRUE)
@@ -71,5 +71,5 @@ endif()
 
 
 set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "c++;m;gcc;dl;c;gcc;dl")
-set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/8.0.7/lib/linux/arm;C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/arm-linux-androideabi/4.9.x/armv7-a/thumb;C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/arm-linux-androideabi/lib/armv7-a/thumb;C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/arm-linux-androideabi/21;C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/arm-linux-androideabi;C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib")
+set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/8.0.7/lib/linux/arm;C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/arm-linux-androideabi/4.9.x/armv7-a/thumb;C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/arm-linux-androideabi/lib/armv7-a/thumb;C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/arm-linux-androideabi/21;C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/arm-linux-androideabi;C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib")
 set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")

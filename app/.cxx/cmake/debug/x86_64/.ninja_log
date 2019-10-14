@@ -1,6 +1,0 @@
-# ninja log v5
-1	602	592568150	CMakeFiles/seciot.dir/seciot.cpp.o	c59a7fa39fdf69fb
-604	781	592568151	C:/Users/wrlu/OneDrive/Repos/seciot-agent-android/app/build/intermediates/cmake/debug/obj/x86_64/libseciot.so	1085af3acec837a6
-0	11	0	clean	75044c7dad8a9b01
-7	444	592574051	CMakeFiles/seciot.dir/seciot.cpp.o	c59a7fa39fdf69fb
-444	657	592574051	C:/Users/wrlu/OneDrive/Repos/seciot-agent-android/app/build/intermediates/cmake/debug/obj/x86_64/libseciot.so	1085af3acec837a6

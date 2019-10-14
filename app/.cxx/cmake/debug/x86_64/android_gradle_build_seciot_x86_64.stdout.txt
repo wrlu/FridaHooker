@@ -1,3 +1,0 @@
-ninja: Entering directory `C:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\.cxx\cmake\debug\x86_64'
-[1/2] Building CXX object CMakeFiles/seciot.dir/seciot.cpp.o
-[2/2] Linking CXX shared library C:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\build\intermediates\cmake\debug\obj\x86_64\libseciot.so

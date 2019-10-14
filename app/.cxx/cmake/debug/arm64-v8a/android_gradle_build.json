@@ -1,38 +1,38 @@
 {
   "stringTable": {
-    "0": "C:/Users/wrlu/OneDrive/Repos/seciot-agent-android/app/.cxx/cmake/debug/arm64-v8a",
-    "1": "--target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dseciot_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
+    "0": "C:/Users/wrlu/OneDrive/Repos/AndroidRepos/seciot-agent-android/app/.cxx/cmake/debug/arm64-v8a",
+    "1": "--target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dseciot_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
   },
   "buildFiles": [
-    "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
-    "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
+    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
+    "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
+    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
   ],
-  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "seciot-Debug-arm64-v8a": {
-      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\" seciot",
+      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\" seciot",
       "buildType": "debug",
-      "toolchain": "675835889",
+      "toolchain": "2378094609",
       "abi": "arm64-v8a",
       "artifactName": "seciot",
       "files": [
         {
-          "src": "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\src\\main\\cpp\\seciot.cpp",
+          "src": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\seciot.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         }
       ],
       "headers": [],
-      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libseciot.so"
+      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libseciot.so"
     }
   },
   "toolchains": {
-    "675835889": {
-      "cppCompilerExecutable": "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    "2378094609": {
+      "cppCompilerExecutable": "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
     }
   },
   "cFileExtensions": [],
