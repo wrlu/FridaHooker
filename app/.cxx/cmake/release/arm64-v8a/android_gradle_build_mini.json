@@ -1,19 +1,19 @@
 {
   "buildFiles": [
-    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
-    "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
+    "/home/wrlu/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
+    "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/src/main/cpp/CMakeLists.txt",
+    "/home/wrlu/Android/Sdk/ndk/20.0.5594570/build/cmake/platforms.cmake"
   ],
   "cleanCommands": [
-    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\arm64-v8a\" clean"
+    "/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/arm64-v8a\" clean"
   ],
-  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "seciot-Release-arm64-v8a": {
       "artifactName": "seciot",
-      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\arm64-v8a\" seciot",
+      "buildCommand": "/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/arm64-v8a\" seciot",
       "abi": "arm64-v8a",
-      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libseciot.so"
+      "output": "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/release/obj/arm64-v8a/libseciot.so"
     }
   }
 }

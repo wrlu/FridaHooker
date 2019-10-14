@@ -7,5 +7,4 @@ public class NativeRootShell {
     }
 
     public static native int execute(String cmd);
-    public static native int executeRoot(String cmd);
 }

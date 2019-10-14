@@ -1,38 +1,38 @@
 {
   "stringTable": {
-    "0": "C:/Users/wrlu/OneDrive/Repos/AndroidRepos/seciot-agent-android/app/.cxx/cmake/release/x86",
-    "1": "--target=i686-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dseciot_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC"
+    "0": "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/x86",
+    "1": "--target=i686-none-linux-android21 --gcc-toolchain=/home/wrlu/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/wrlu/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Dseciot_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC"
   },
   "buildFiles": [
-    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
-    "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
+    "/home/wrlu/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
+    "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/src/main/cpp/CMakeLists.txt",
+    "/home/wrlu/Android/Sdk/ndk/20.0.5594570/build/cmake/platforms.cmake"
   ],
   "cleanCommands": [
-    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" clean"
+    "/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/x86\" clean"
   ],
-  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "seciot-Release-x86": {
-      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" seciot",
+      "buildCommand": "/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/x86\" seciot",
       "buildType": "release",
-      "toolchain": "2378094609",
+      "toolchain": "2233073142",
       "abi": "x86",
       "artifactName": "seciot",
       "files": [
         {
-          "src": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\seciot.cpp",
+          "src": "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/src/main/cpp/seciot.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         }
       ],
       "headers": [],
-      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libseciot.so"
+      "output": "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/release/obj/x86/libseciot.so"
     }
   },
   "toolchains": {
-    "2378094609": {
-      "cppCompilerExecutable": "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    "2233073142": {
+      "cppCompilerExecutable": "/home/wrlu/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
     }
   },
   "cFileExtensions": [],
