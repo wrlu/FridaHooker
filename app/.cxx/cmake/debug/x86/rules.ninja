@@ -17,7 +17,7 @@
 rule CXX_COMPILER__seciot
   depfile = $DEP_FILE
   deps = gcc
-  command = C:\Users\wrlu\Android\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = C:\Users\wrlu\Android\Sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -25,7 +25,7 @@ rule CXX_COMPILER__seciot
 # Rule for linking CXX shared library.
 
 rule CXX_SHARED_LIBRARY_LINKER__seciot
-  command = cmd.exe /C "$PRE_LINK && C:\Users\wrlu\Android\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
+  command = cmd.exe /C "$PRE_LINK && C:\Users\wrlu\Android\Sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking CXX shared library $TARGET_FILE
   restat = $RESTAT
 
@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\src\main\cpp -BC:\Users\wrlu\OneDrive\Repos\AndroidRepos\seciot-agent-android\app\.cxx\cmake\debug\x86
+  command = C:\Users\wrlu\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\src\main\cpp -BC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\.cxx\cmake\debug\x86
   description = Re-running CMake...
   generator = 1
 

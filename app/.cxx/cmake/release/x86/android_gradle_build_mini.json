@@ -1,19 +1,19 @@
 {
   "buildFiles": [
-    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Users\\wrlu\\Android\\sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
-    "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
+    "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
+    "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" clean"
+    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" clean"
   ],
-  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "seciot-Release-x86": {
       "artifactName": "seciot",
-      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" seciot",
+      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86\" seciot",
       "abi": "x86",
-      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\AndroidRepos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libseciot.so"
+      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libseciot.so"
     }
   }
 }

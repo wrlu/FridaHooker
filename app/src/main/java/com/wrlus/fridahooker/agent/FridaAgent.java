@@ -4,16 +4,13 @@ import android.util.Log;
 
 import com.wrlus.fridahooker.util.LogUtil;
 import com.wrlus.fridahooker.util.NativeRootShell;
-import com.wrlus.fridahooker.util.RootShell;
 
 import org.tukaani.xz.XZInputStream;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -51,15 +48,6 @@ public class FridaAgent {
         int code = NativeRootShell.execute("ls " + targetPath + "frida-server");
         LogUtil.d(TAG, "checkFridaInstallation exit with code "+code);
         return 0 == code;
-    }
-
-    public void downloadFrida(String version, String abi, Callback callback) {
-        String url = FRIDA_CENTER + "/attach/downloads/frida/${version}/".replace("${version}", version) +
-                "frida-server-${version}-android-${abi}.xz".replace("${version}", version).replace("${abi}", abi);
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(url).build();
-        LogUtil.d(TAG, url);
-        okHttpClient.newCall(request).enqueue(callback);
     }
 
     public File extractXZ(InputStream source, String target) throws IOException {
