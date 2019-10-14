@@ -1,20 +1,20 @@
-Executable : /home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/cmake
+Executable : C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\cmake.exe
 arguments : 
--H/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/src/main/cpp
--B/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/debug/x86
+-HC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\src\main\cpp
+-BC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\.cxx\cmake\debug\x86
 -DANDROID_ABI=x86
 -DANDROID_PLATFORM=android-21
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/debug/obj/x86
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\build\intermediates\cmake\debug\obj\x86
 -DCMAKE_BUILD_TYPE=Debug
--DANDROID_NDK=/home/wrlu/Android/Sdk/ndk/20.0.5594570
+-DANDROID_NDK=C:\Users\wrlu\Android\sdk\ndk-bundle
 -DCMAKE_CXX_FLAGS=
 -DCMAKE_SYSTEM_NAME=Android
 -DCMAKE_ANDROID_ARCH_ABI=x86
 -DCMAKE_SYSTEM_VERSION=21
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
--DCMAKE_ANDROID_NDK=/home/wrlu/Android/Sdk/ndk/20.0.5594570
--DCMAKE_TOOLCHAIN_FILE=/home/wrlu/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake
+-DCMAKE_ANDROID_NDK=C:\Users\wrlu\Android\sdk\ndk-bundle
+-DCMAKE_TOOLCHAIN_FILE=C:\Users\wrlu\Android\sdk\ndk-bundle\build\cmake\android.toolchain.cmake
 -G Ninja
--DCMAKE_MAKE_PROGRAM=/home/wrlu/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
+-DCMAKE_MAKE_PROGRAM=C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\ninja.exe
 jvmArgs : 
 

@@ -1,7 +1,7 @@
 [
 {
-  "directory": "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/release/x86",
-  "command": "/home/wrlu/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=i686-none-linux-android21 --gcc-toolchain=/home/wrlu/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/wrlu/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot  -Dseciot_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -o CMakeFiles/seciot.dir/seciot.cpp.o -c /home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/src/main/cpp/seciot.cpp",
-  "file": "/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/src/main/cpp/seciot.cpp"
+  "directory": "C:/Users/wrlu/OneDrive/Repos/seciot-agent-android/app/.cxx/cmake/release/x86",
+  "command": "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -Dseciot_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -o CMakeFiles\\seciot.dir\\seciot.cpp.o -c C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\src\\main\\cpp\\seciot.cpp",
+  "file": "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\src\\main\\cpp\\seciot.cpp"
 }
 ]

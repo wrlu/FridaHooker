@@ -1,5 +1,3 @@
 # ninja log v5
-0	280	1568280673	CMakeFiles/seciot.dir/seciot.cpp.o	d70ac589832b1065
-281	328	1568280673	/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/debug/obj/arm64-v8a/libseciot.so	6f1aac43fc7cf809
-0	245	1569052126	CMakeFiles/seciot.dir/seciot.cpp.o	d70ac589832b1065
-245	354	1569052126	/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/build/intermediates/cmake/debug/obj/arm64-v8a/libseciot.so	6f1aac43fc7cf809
+1	1891	592739212	CMakeFiles/seciot.dir/seciot.cpp.o	74c8bd520785cf76
+1892	2080	592739212	C:/Users/wrlu/OneDrive/Repos/seciot-agent-android/app/build/intermediates/cmake/debug/obj/arm64-v8a/libseciot.so	306b79d7f6c96760

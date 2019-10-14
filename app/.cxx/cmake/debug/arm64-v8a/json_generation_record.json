@@ -5,7 +5,19 @@
   },
   {
     "level": "INFO",
-    "message": "JSON \u0027/home/wrlu/文档/信息安全研究/物联网安全/IoT安全检测平台/seciot-agent-android/app/.cxx/cmake/debug/arm64-v8a/android_gradle_build.json\u0027 was up-to-date"
+    "message": "Trying to locate CMake in local SDK repository."
+  },
+  {
+    "level": "INFO",
+    "message": "- CMake found in SDK at \u0027C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027"
+  },
+  {
+    "level": "INFO",
+    "message": "CMake \u00273.6.0\u0027 found in SDK did not match requested version \u00273.10.2\u0027."
+  },
+  {
+    "level": "INFO",
+    "message": "JSON \u0027C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\debug\\arm64-v8a\\android_gradle_build.json\u0027 was up-to-date"
   },
   {
     "level": "INFO",
