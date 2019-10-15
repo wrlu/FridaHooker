@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Users\wrlu\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\src\main\cpp -BC:\Users\wrlu\OneDrive\Repos\seciot-agent-android\app\.cxx\cmake\release\arm64-v8a
+  command = C:\Users\wrlu\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\Users\wrlu\OneDrive\Repos\Frida-Android\FridaHooker\app\src\main\cpp -BC:\Users\wrlu\OneDrive\Repos\Frida-Android\FridaHooker\app\.cxx\cmake\release\arm64-v8a
   description = Re-running CMake...
   generator = 1
 

@@ -3,24 +3,18 @@
     <string name="app_status">Frida Status</string>
     <string name="frida_missing">frida server %1$s-%2$s missing</string>
     <string name="frida_ready">frida server %1$s-%2$s ready</string>
-    <string name="frp_missing">frp client %1$s-%2$s missing</string>
-    <string name="frp_ready">frp client %1$s-%2$s ready</string>
     <string name="manage_module">Manage</string>
-    <string name="frida_unavaliable">frida server unavaliable</string>
-    <string name="frp_unavaliable">frp client unavaliable</string>
     <string name="android_ver">System Version: Android %1$s ( API %2$d )</string>
     <string name="device_name">Device Name: %1$s</string>
     <string name="device_abi">Structure: %1$s</string>
-    <string name="server_host">SecIoT Service: %1$s</string>
     <string name="refresh">Refresh</string>
     <string name="settings">Preferences</string>
     <string name="about">About FridaHooker</string>
-    <string name="gplv2">1.4-12.7.4-aosp\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \n\nSource Code: https://gitlab.com/wrlu/seciot-agent-android</string>
-    <string name="frps_ip">Frps Proxy: %1$s</string>
-    <string name="reset">Reset</string>
-    <string name="reset_client_id">Reset Client ID</string>
+    <string name="gplv2">1.4.1-12.7.11-aosp\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \n\nSource Code: https://gitlab.com/wrlu/seciot-agent-android</string>
     <string name="local_use">Enable Local Mode</string>
     <string name="debug_mode">Show Debug Log</string>
     <string name="need_permissions">Need Permissions</string>
     <string name="need_permissions_content">此应用使用电话权限读取手机信息并选择正确版本的frida，使用存储权限读取外部存储中的frida文件用于安装。如果您拒绝这些权限，程序将退出。</string>
+    <string name="warnings">Warning</string>
+    <string name="unsupported_device">Frida server is not supported on this device.\nProbable reasons\n1. Android API Level not supported (Android Q or higher is not supported now)\n2. Device ABI not supported (only supports arm, arm64, x86, x86_64)</string>
 </resources>

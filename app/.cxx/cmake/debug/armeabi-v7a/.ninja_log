@@ -1,3 +1,3 @@
 # ninja log v5
-1	672	592739213	CMakeFiles/seciot.dir/seciot.cpp.o	73aab0db67c19d80
-673	851	592739213	C:/Users/wrlu/OneDrive/Repos/seciot-agent-android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libseciot.so	b637f7597e2bffcf
+0	567	592814564	CMakeFiles/seciot.dir/seciot.cpp.o	8ca6164bf88ef425
+568	853	592814564	C:/Users/wrlu/OneDrive/Repos/Frida-Android/FridaHooker/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libseciot.so	5c23d83da6b543db

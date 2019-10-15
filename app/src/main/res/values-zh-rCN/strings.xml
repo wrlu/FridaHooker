@@ -1,26 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_status">Frida 状态</string>
-    <string name="frp_missing">frp client %1$s-%2$s 缺失</string>
     <string name="frida_missing">frida server %1$s-%2$s 缺失</string>
     <string name="frida_ready">frida server %1$s-%2$s 就绪</string>
-    <string name="frp_ready">frp client %1$s-%2$s 就绪</string>
     <string name="manage_module">管理</string>
-    <string name="frida_unavaliable">frida server 不可用</string>
-    <string name="frp_unavaliable">frp client 不可用</string>
     <string name="android_ver">系统版本: Android %1$s ( API %2$d )</string>
     <string name="device_name">设备名称: %1$s</string>
     <string name="device_abi">体系结构: %1$s</string>
-    <string name="server_host">SecIoT 服务: %1$s</string>
     <string name="refresh">刷新</string>
     <string name="settings">配置设置</string>
     <string name="about">关于 FridaHooker</string>
-    <string name="gplv2">1.4-12.7.4-aosp\n\n本程序是自由软件，您可以根据自由软件基金会出版的 GNU 通用公共许可证第2版的条款与条件重新分发和/或修改它。\n发布本程序只是希望它对您有用，但不包含任何保证，甚至没有对适合特定用途的隐含保证。\n有关详细信息，请参阅 GNU 通用公共许可证。 \n\n获取源代码: https://gitlab.com/wrlu/seciot-agent-android</string>
-    <string name="frps_ip">Frps 代理: %1$s</string>
-    <string name="reset">重置</string>
-    <string name="reset_client_id">重置客户端ID</string>
+    <string name="gplv2">1.4.1-12.7.11-aosp\n\n本程序是自由软件，您可以根据自由软件基金会出版的 GNU 通用公共许可证第2版的条款与条件重新分发和/或修改它。\n发布本程序只是希望它对您有用，但不包含任何保证，甚至没有对适合特定用途的隐含保证。\n有关详细信息，请参阅 GNU 通用公共许可证。 \n\n获取源代码: https://gitlab.com/wrlu/seciot-agent-android</string>
     <string name="local_use">启用本地模式</string>
     <string name="debug_mode">显示调试日志</string>
     <string name="need_permissions">需要权限</string>
     <string name="need_permissions_content">此应用使用电话权限读取手机信息并选择正确版本的frida，使用存储权限读取外部存储中的frida文件用于安装。如果您拒绝这些权限，程序将退出。</string>
+    <string name="warnings">警告</string>
+    <string name="unsupported_device">frida server在此设备上暂不支持\n可能的原因\n1. API级别不受支持 (暂不支持Android Q或更高版本)\n2. 体系结构不受支持 (仅支持arm, arm64, x86, x86_64)</string>
 </resources>

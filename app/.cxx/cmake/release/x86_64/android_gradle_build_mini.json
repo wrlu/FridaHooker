@@ -2,18 +2,18 @@
   "buildFiles": [
     "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
     "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\src\\main\\cpp\\CMakeLists.txt"
+    "C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\src\\main\\cpp\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86_64\" clean"
+    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\.cxx\\cmake\\release\\x86_64\" clean"
   ],
-  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "seciot-Release-x86_64": {
       "artifactName": "seciot",
-      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\.cxx\\cmake\\release\\x86_64\" seciot",
+      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\.cxx\\cmake\\release\\x86_64\" seciot",
       "abi": "x86_64",
-      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\seciot-agent-android\\app\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libseciot.so"
+      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libseciot.so"
     }
   }
 }

@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wrlus.fridahooker.R;
 import com.wrlus.fridahooker.agent.FridaAgent;
@@ -39,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
-    private static final String localFridaVersion = "12.7.4";
+    private static final String localFridaVersion = "12.7.11";
     private String abi = "Unknown";
     private String fridaVersion = localFridaVersion;
     private boolean isProductSupported = false;
@@ -144,7 +143,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void onClick(View v) {
                 if (!isProductSupported) {
-                    Toast.makeText(MainActivity.this, "很抱歉，此设备暂时无法支持。", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    dialog.setTitle(R.string.warnings);
+                    dialog.setMessage(R.string.unsupported_device);
+                    dialog.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    dialog.show();
                     return;
                 }
                 List<String> manageFridaAction = new ArrayList<>();
@@ -186,6 +194,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         String deviceAbiString = getString(R.string.device_abi);
         deviceAbiString = String.format(deviceAbiString, abi);
         textViewStructure.setText(deviceAbiString);
+        LogUtil.d(TAG, "系统版本："+androidVerString);
+        LogUtil.d(TAG, "设备名称："+deviceNameString);
+        LogUtil.d(TAG, "体系结构："+deviceAbiString);
+        if (!DeviceHelper.checkAPILevel()) {
+            LogUtil.t(this, "暂不支持该系统版本", "Unsupport API Level = "+DeviceHelper.getAPILevel());
+            return;
+        }
         if (abi.contains("arm64")) {
             this.abi = "arm64";
             isProductSupported = true;
@@ -201,9 +216,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         } else {
             LogUtil.t(this, "暂不支持此设备", "Unsupport ABI = "+abi);
         }
-        LogUtil.d(TAG, "系统版本："+androidVerString);
-        LogUtil.d(TAG, "设备名称："+deviceNameString);
-        LogUtil.d(TAG, "体系结构："+deviceAbiString);
     }
 
     protected void checkFridaInstallation() {
