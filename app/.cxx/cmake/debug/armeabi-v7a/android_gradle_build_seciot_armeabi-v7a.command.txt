@@ -1,7 +1,0 @@
-Executable : C:\Users\wrlu\Android\sdk\cmake\3.10.2.4988404\bin\ninja.exe
-arguments : 
--C
-C:\Users\wrlu\OneDrive\Repos\Frida-Android\FridaHooker\app\.cxx\cmake\debug\armeabi-v7a
-seciot
-jvmArgs : 
-
