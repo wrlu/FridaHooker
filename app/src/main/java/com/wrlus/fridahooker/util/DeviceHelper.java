@@ -26,8 +26,6 @@ public class DeviceHelper {
     }
 
     public static boolean checkAPILevel() {
-//        frida issues #971
-//        https://github.com/frida/frida/issues/971
-        return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q);
+        return true;
     }
 }

@@ -38,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
-    private static final String localFridaVersion = "12.7.16";
+    private static final String localFridaVersion = "12.7.23";
     private String abi = "Unknown";
     private String fridaVersion = localFridaVersion;
     private boolean isProductSupported = false;
@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             isProductSupported = true;
         } else {
             LogUtil.t(this, "暂不支持此设备", "Unsupport ABI = "+abi);
+            isProductSupported = false;
         }
     }
 

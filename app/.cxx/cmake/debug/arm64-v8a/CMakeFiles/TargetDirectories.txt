@@ -1,0 +1,3 @@
+C:/Users/wrlu/OneDrive/Repos/Frida-Android/FridaHooker/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/seciot.dir
+C:/Users/wrlu/OneDrive/Repos/Frida-Android/FridaHooker/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/wrlu/OneDrive/Repos/Frida-Android/FridaHooker/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/rebuild_cache.dir

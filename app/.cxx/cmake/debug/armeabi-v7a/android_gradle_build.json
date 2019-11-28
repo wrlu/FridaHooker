@@ -1,0 +1,42 @@
+{
+  "stringTable": {
+    "0": "C:/Users/wrlu/OneDrive/Repos/Frida-Android/FridaHooker/app/.cxx/cmake/debug/armeabi-v7a",
+    "1": "--target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/wrlu/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dseciot_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
+  },
+  "buildFiles": [
+    "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\platforms.cmake",
+    "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" clean"
+  ],
+  "buildTargetsCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "seciot-Debug-armeabi-v7a": {
+      "buildCommand": "C:\\Users\\wrlu\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\.cxx\\cmake\\debug\\armeabi-v7a\" seciot",
+      "buildType": "debug",
+      "toolchain": "675835889",
+      "abi": "armeabi-v7a",
+      "artifactName": "seciot",
+      "files": [
+        {
+          "src": "C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\src\\main\\cpp\\seciot.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "C:\\Users\\wrlu\\OneDrive\\Repos\\Frida-Android\\FridaHooker\\app\\build\\intermediates\\cmake\\debug\\obj\\armeabi-v7a\\libseciot.so"
+    }
+  },
+  "toolchains": {
+    "675835889": {
+      "cppCompilerExecutable": "C:\\Users\\wrlu\\Android\\Sdk\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
