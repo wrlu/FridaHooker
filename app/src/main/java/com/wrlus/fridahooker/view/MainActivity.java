@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return true;
     }
 
-    protected void initUi() {
+    private void initUi() {
         switchStatus = findViewById(R.id.switchStatus);
         imageStatus = findViewById(R.id.imageStatus);
         textViewFridaVersion = findViewById(R.id.textViewFridaVersion);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    protected void getSystemInfo() {
+    private void getSystemInfo() {
         String androidVerString = getString(R.string.android_ver);
         androidVerString = String.format(androidVerString, DeviceHelper.getAndroidVersion(), DeviceHelper.getAPILevel());
         textViewAndroidVer.setText(androidVerString);
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    protected void checkFridaInstallation() {
+    private void checkFridaInstallation() {
         boolean isInstalled = fridaAgent.checkFridaInstallation(fridaVersion);
         imageStatus.setImageResource(isInstalled ? R.mipmap.status_success : R.mipmap.status_error);
         String fridaStatusString = getString(isInstalled ? R.string.frida_ready : R.string.frida_missing);
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         isFridaServerInstalled = isInstalled;
     }
 
-    protected void checkFridaRunning() {
+    private void checkFridaRunning() {
         fridaAgent.checkFridaRunning(new StatusCallback() {
             @Override
             public void onSuccess() {
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     }
 
-    protected void getLocalFrida() {
+    private void getLocalFrida() {
         final String filename = "frida-server-" + fridaVersion + "-android-" + abi + ".xz";
         final AssetManager assetManager = getAssets();
         try {
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    protected void installFrida(File downloadFile) {
+    private void installFrida(File downloadFile) {
         boolean isSuccess = fridaAgent.installFrida(downloadFile, fridaVersion);
         if (isSuccess) {
             LogUtil.t(this, "frida server "+fridaVersion+" 安装成功", null);
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         checkFridaInstallation();
     }
 
-    protected void startFrida() {
+    private void startFrida() {
         boolean isSuccess = fridaAgent.startFrida(fridaVersion);
         if (isSuccess) {
             LogUtil.t(this, "frida server "+fridaVersion+" 已经启动", null);
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         checkFridaRunning();
     }
 
-    protected void stopFrida() {
+    private void stopFrida() {
         boolean isSuccess = fridaAgent.stopFrida(fridaVersion, abi);
         if (isSuccess) {
             LogUtil.t(this, "frida server "+fridaVersion+" 已经停止", null);
@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         checkFridaRunning();
     }
 
-    protected void removeFrida() {
+    private void removeFrida() {
         boolean isSuccess = fridaAgent.removeFrida(fridaVersion);
         if (isSuccess) {
             LogUtil.t(this, "frida server "+fridaVersion+" 卸载成功", null);
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
-    protected boolean checkPermission(String permission) {
+    private boolean checkPermission(String permission) {
         boolean permissionAccessApproved =
                 ActivityCompat.checkSelfPermission(this,
                         permission) ==
