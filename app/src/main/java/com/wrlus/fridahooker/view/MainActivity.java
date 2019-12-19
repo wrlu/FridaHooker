@@ -38,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
-    private static final String localFridaVersion = "12.7.23";
+    private static final String localFridaVersion = "12.8.0";
     private String abi = "Unknown";
     private String fridaVersion = localFridaVersion;
     private boolean isProductSupported = false;
