@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 4
-        versionName "1.5-12.8.0-aosp"
+        versionName "1.5-12.8.6-aosp"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -27,11 +27,6 @@ android {
             version "3.10.2"
         }
     }
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
-    buildToolsVersion = '29.0.2'
 }
 
 dependencies {

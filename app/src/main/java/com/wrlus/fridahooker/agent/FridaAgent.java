@@ -42,21 +42,24 @@ public class FridaAgent {
         return 0 == code;
     }
 
-    public void checkFridaRunning(StatusCallback callback) {
-        Thread checkFridaThread = new Thread(()->{
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            try {
-                ServerSocket serverSocket = new ServerSocket(27042);
-                serverSocket.close();
-                LogUtil.d(TAG, "checkFridaRunning try to bind tcp:27042 success, frida is not running.");
-                callback.onFailure(null);
-            } catch (IOException e) {
-                LogUtil.d(TAG, "checkFridaRunning try to bind tcp:27042 but failed, frida is still running.");
-                callback.onSuccess();
+    public void checkFridaRunning(final StatusCallback callback) {
+        Thread checkFridaThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    ServerSocket serverSocket = new ServerSocket(27042);
+                    serverSocket.close();
+                    LogUtil.d(TAG, "checkFridaRunning try to bind tcp:27042 success, frida is not running.");
+                    callback.onFailure(null);
+                } catch (IOException e) {
+                    LogUtil.d(TAG, "checkFridaRunning try to bind tcp:27042 but failed, frida is still running.");
+                    callback.onSuccess();
+                }
             }
         });
         checkFridaThread.setDaemon(true);

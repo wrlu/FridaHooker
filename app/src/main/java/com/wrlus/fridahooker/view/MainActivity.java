@@ -38,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
-    private static final String localFridaVersion = "12.8.0";
+    private static final String localFridaVersion = "12.8.6";
     private String abi = "Unknown";
     private String fridaVersion = localFridaVersion;
     private boolean isProductSupported = false;
@@ -235,16 +235,22 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void onSuccess() {
                 isFridaServerRunning = true;
-                runOnUiThread(()->{
-                    switchStatus.setChecked(true);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switchStatus.setChecked(true);
+                    }
                 });
             }
 
             @Override
             public void onFailure(Throwable e) {
                 isFridaServerRunning = false;
-                runOnUiThread(()->{
-                    switchStatus.setChecked(false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switchStatus.setChecked(false);
+                    }
                 });
             }
         });
@@ -308,12 +314,15 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public void setProgress(final int progressBarId, final double percentage) {
-        runOnUiThread(()->{
-            ProgressBar bar = findViewById(progressBarId);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                bar.setProgress((int) (bar.getMax() * percentage), true);
-            } else {
-                bar.setProgress((int) (bar.getMax() * percentage));
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ProgressBar bar = findViewById(progressBarId);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    bar.setProgress((int) (bar.getMax() * percentage), true);
+                } else {
+                    bar.setProgress((int) (bar.getMax() * percentage));
+                }
             }
         });
     }
