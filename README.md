@@ -24,7 +24,9 @@
 - Q1：为什么显示安装frida server失败？
 - A1：您可能没有给应用授予root权限，前往Magisk、SuperSU等root管理程序中为FridaHooker授予root权限。
 - Q2：为什么打开了frida但是开关立刻就关闭了？
-- A2：这是frida server崩溃了的表现，在Android 10中，运行frida server可能会有问题。如果您认为这是一个bug，欢迎提出issue。
+- A2：这是frida server崩溃了的表现，目前frida官方已经修复了对Android Q的支持，更新本应用即可。
+- Q3：为什么首次启动frida server之后提示成功但开关仍然是关闭的？
+- A3：这是一个已知问题，是因为检测frida正在运行的方法速度过快造成的，重新打开应用即可解决。
 
 ## 七、截图
 <img src="img/demo.png" />
