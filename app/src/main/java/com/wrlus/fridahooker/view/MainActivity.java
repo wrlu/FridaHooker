@@ -38,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
-    private static final String localFridaVersion = "12.8.6";
+    private static final String localFridaVersion = "12.8.11";
     private String abi = "Unknown";
     private String fridaVersion = localFridaVersion;
     private boolean isProductSupported = false;
@@ -72,7 +72,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
         if (item.getItemId() == R.id.btnRefresh) {
             checkFridaInstallation();
-            checkFridaRunning();
+            checkFridaRunning(new StatusCallback() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onFailure(Throwable e) {
+
+                }
+            });
         } else if (item.getItemId() == R.id.btnSettings) {
             LogUtil.d(TAG, "准备进入设置页面");
             Intent intent = new Intent(this, SettingsActivity.class);
@@ -96,7 +106,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void onStart() {
         super.onStart();
         checkFridaInstallation();
-        checkFridaRunning();
+        checkFridaRunning(new StatusCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+
+            }
+        });
     }
 
     @Override
@@ -230,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         isFridaServerInstalled = isInstalled;
     }
 
-    private void checkFridaRunning() {
+    private void checkFridaRunning(final StatusCallback callback) {
         fridaAgent.checkFridaRunning(new StatusCallback() {
             @Override
             public void onSuccess() {
@@ -241,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         switchStatus.setChecked(true);
                     }
                 });
+                callback.onSuccess();
             }
 
             @Override
@@ -252,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         switchStatus.setChecked(false);
                     }
                 });
+                callback.onFailure(e);
             }
         });
 
@@ -275,41 +297,79 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private void installFrida(File downloadFile) {
         boolean isSuccess = fridaAgent.installFrida(downloadFile, fridaVersion);
         if (isSuccess) {
+            checkFridaInstallation();
             LogUtil.t(this, "frida server "+fridaVersion+" 安装成功", null);
         } else {
             LogUtil.t(this, "frida server "+fridaVersion+" 安装失败", null);
         }
-        checkFridaInstallation();
     }
 
     private void startFrida() {
-        boolean isSuccess = fridaAgent.startFrida(fridaVersion);
-        if (isSuccess) {
-            LogUtil.t(this, "frida server "+fridaVersion+" 已经启动", null);
+        boolean isFinish = fridaAgent.startFrida(fridaVersion);
+        if (isFinish) {
+            checkFridaRunning(new StatusCallback() {
+                @Override
+                public void onSuccess() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LogUtil.t(MainActivity.this, "frida server "+fridaVersion+" 已经启动", null);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Throwable e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LogUtil.t(MainActivity.this, "frida server "+fridaVersion+" 启动失败", null);
+                        }
+                    });
+                }
+            });
         } else {
             LogUtil.t(this, "frida server "+fridaVersion+" 启动失败", null);
         }
-        checkFridaRunning();
     }
 
     private void stopFrida() {
-        boolean isSuccess = fridaAgent.stopFrida(fridaVersion, abi);
-        if (isSuccess) {
-            LogUtil.t(this, "frida server "+fridaVersion+" 已经停止", null);
+        boolean isFinish = fridaAgent.stopFrida(fridaVersion, abi);
+        if (isFinish) {
+            checkFridaRunning(new StatusCallback() {
+                @Override
+                public void onSuccess() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LogUtil.t(MainActivity.this, "frida server "+fridaVersion+" 未能停止", null);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Throwable e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LogUtil.t(MainActivity.this, "frida server "+fridaVersion+" 已经停止", null);
+                        }
+                    });
+                }
+            });
         } else {
             LogUtil.t(this, "frida server "+fridaVersion+" 未能停止", null);
         }
-        checkFridaRunning();
     }
 
     private void removeFrida() {
         boolean isSuccess = fridaAgent.removeFrida(fridaVersion);
         if (isSuccess) {
+            checkFridaInstallation();
             LogUtil.t(this, "frida server "+fridaVersion+" 卸载成功", null);
         } else {
             LogUtil.t(this, "frida server "+fridaVersion+" 卸载失败", null);
         }
-        checkFridaInstallation();
     }
 
     @Override

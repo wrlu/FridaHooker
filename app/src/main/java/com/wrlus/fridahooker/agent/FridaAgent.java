@@ -18,6 +18,7 @@ public class FridaAgent {
     private static final String TAG = "FridaAgent";
     private static FridaAgent instance;
     private Context context;
+    private static final int FRIDA_CHECKER_DELAY = 3000;
 
     private FridaAgent(Context context) {
         this.context = context;
@@ -47,7 +48,7 @@ public class FridaAgent {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(FRIDA_CHECKER_DELAY);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

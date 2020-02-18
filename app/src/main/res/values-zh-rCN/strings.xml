@@ -10,7 +10,7 @@
     <string name="refresh">刷新</string>
     <string name="settings">配置设置</string>
     <string name="about">关于 FridaHooker</string>
-    <string name="gplv2">1.5-12.8.6-aosp\n\n本程序是自由软件，您可以根据自由软件基金会出版的 GNU 通用公共许可证第2版的条款与条件重新分发和/或修改它。\n发布本程序只是希望它对您有用，但不包含任何保证，甚至没有对适合特定用途的隐含保证。\n有关详细信息，请参阅 GNU 通用公共许可证。 \n\n获取源代码: https://github.com/wrlu/FridaHooker</string>
+    <string name="gplv2">1.5.12.8.11\n\n本程序是自由软件，您可以根据自由软件基金会出版的 GNU 通用公共许可证第2版的条款与条件重新分发和/或修改它。\n发布本程序只是希望它对您有用，但不包含任何保证，甚至没有对适合特定用途的隐含保证。\n有关详细信息，请参阅 GNU 通用公共许可证。 \n\n获取源代码: https://github.com/wrlu/FridaHooker</string>
     <string name="local_use">启用本地模式</string>
     <string name="debug_mode">显示调试日志</string>
     <string name="need_permissions">需要权限</string>

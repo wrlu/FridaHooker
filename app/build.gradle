@@ -6,8 +6,8 @@ android {
         applicationId "com.wrlus.seciot"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.5-12.8.6-aosp"
+        versionCode 5
+        versionName "1.5.12.8.11"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
