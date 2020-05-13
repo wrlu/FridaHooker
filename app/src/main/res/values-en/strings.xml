@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_status">Frida Status</string>
-    <string name="frida_missing">frida server %1$s-%2$s missing</string>
-    <string name="frida_ready">frida server %1$s-%2$s ready</string>
-    <string name="manage_module">Manage</string>
+    <string name="frida_missing">frida server %1$smissing</string>
+    <string name="frida_ready">frida server %1$s ready</string>
+    <string name="manage">Manage</string>
     <string name="android_ver">System Version: Android %1$s ( API %2$d )</string>
     <string name="device_name">Device Name: %1$s</string>
     <string name="device_abi">Structure: %1$s</string>
     <string name="refresh">Refresh</string>
     <string name="settings">Preferences</string>
     <string name="about">About FridaHooker</string>
-    <string name="gplv2">1.5.12.8.11\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \n\nSource Code: https://github.com/wrlu/FridaHooker</string>
+    <string name="gplv2">1.6.12820\n\nThis program is free software; you can redistribute it and/or modify it under the terms and conditions of the GNU General Public License, version 2, as published by the Free Software Foundation.\nThis program is distributed in the hope it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \nSee the GNU General Public License for more details. \n\nSource Code: https://github.com/wrlu/FridaHooker</string>
     <string name="local_use">Enable Local Mode</string>
     <string name="debug_mode">Show Debug Log</string>
     <string name="need_permissions">Need Permissions</string>
     <string name="need_permissions_content">此应用使用电话权限读取手机信息并选择正确版本的frida，使用存储权限读取外部存储中的frida文件用于安装。如果您拒绝这些权限，程序将退出。</string>
     <string name="warnings">Warning</string>
-    <string name="unsupported_device">Frida server is not supported on this device.\nProbable reasons\n1. Android API Level not supported (Android Q or higher is not supported now)\n2. Device ABI not supported (only supports arm, arm64, x86, x86_64)</string>
+    <string name="unsupported_device">Frida server is not supported on this device.\nProbable reasons\n1. Android API Level not supported (Android R or higher is not supported now)\n2. Device ABI not supported (only supports arm, arm64, x86, x86_64)</string>
+    <string name="close">close</string>
+    <string name="operation_failed_message">Operation failed, please report an error.</string>
+    <string name="install">Install</string>
+    <string name="remove">Remove</string>
+    <string name="install_from_sdcard">Install from storage</string>
 </resources>
