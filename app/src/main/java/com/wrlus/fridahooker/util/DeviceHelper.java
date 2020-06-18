@@ -13,8 +13,6 @@ public class DeviceHelper {
             return "arm64";
         } else if (systemAbi.contains("arm")) {
             return "arm";
-        } else if (systemAbi.contains("x86_64")) {
-            return "x86_64";
         } else if (systemAbi.contains("x86")) {
             return "x86";
         }

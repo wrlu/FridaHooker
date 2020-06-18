@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "com.wrlus.seciot"
+        applicationId "com.wrlus.fridahooker"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 6
-        versionName "1.6.12820"
+        versionName "1.6.1298"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
