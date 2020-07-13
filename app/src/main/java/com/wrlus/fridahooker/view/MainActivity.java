@@ -1,39 +1,41 @@
 package com.wrlus.fridahooker.view;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.wrlus.fridahooker.R;
-import com.wrlus.fridahooker.agent.FridaAgent;
-import com.wrlus.fridahooker.agent.StatusCallback;
-import com.wrlus.fridahooker.util.Config;
-import com.wrlus.fridahooker.util.Msg;
-import com.wrlus.fridahooker.util.DeviceHelper;
-import com.wrlus.fridahooker.util.LogUtil;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.wrlus.fridahooker.R;
+import com.wrlus.fridahooker.agent.FridaAgent;
+import com.wrlus.fridahooker.agent.StatusCallback;
+import com.wrlus.fridahooker.config.Config;
+import com.wrlus.fridahooker.util.Msg;
+import com.wrlus.fridahooker.util.DeviceHelper;
+import com.wrlus.fridahooker.util.LogUtil;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback, ProgressCallback {
     private static final String TAG = "MainActivity";
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private Switch switchStatus;
     private ImageView imageStatus;
     private TextView textViewFridaVersion;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         TextView textViewDeviceName = findViewById(R.id.textViewDeviceName);
         TextView textViewStructure = findViewById(R.id.textViewStructure);
         Button btnFridaManage = findViewById(R.id.btnFridaManage);
+        progressBar = findViewById(R.id.progressBar);
         imageStatus.setImageResource(R.mipmap.status_error);
         switchStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -166,7 +170,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private void checkAll() {
+        progressBar.setVisibility(View.VISIBLE);
         if (fridaAgent == null) {
+            progressBar.setVisibility(View.GONE);
             return;
         }
         fridaAgent.checkAll(new StatusCallback() {
@@ -176,21 +182,22 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     if (!fridaAgent.isSupported()) {
                         makeMessageDialog(R.string.warnings, R.string.unsupported_device).show();
                     }
-
                     imageStatus.setImageResource(fridaAgent.isInstalled() ? R.mipmap.status_success : R.mipmap.status_error);
                     String fridaStatusString = getString(fridaAgent.isInstalled() ? R.string.frida_ready : R.string.frida_missing);
                     fridaStatusString = String.format(fridaStatusString, fridaVersion);
                     textViewFridaVersion.setText(fridaStatusString);
                     setProgress(R.id.progressBarFridaInstall, fridaAgent.isInstalled() ? 1 : 0 );
                     switchStatus.setEnabled(fridaAgent.isInstalled());
-
                     switchStatus.setChecked(fridaAgent.isStarted());
+                    progressBar.setVisibility(View.GONE);
                 });
             }
 
             @Override
             public void onFailure(Throwable e) {
-
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                });
             }
         });
     }
@@ -293,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return dialog;
     }
 
+    @Deprecated
     private AlertDialog.Builder makeMessageDialog(String title, String message) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
         dialog.setTitle(title);
@@ -300,21 +308,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         dialog.setNegativeButton(R.string.close, (dialog1, which) -> {});
         return dialog;
     }
-
-//    private boolean checkPermission(String permission) {
-//        boolean permissionAccessApproved =
-//                ActivityCompat.checkSelfPermission(this,
-//                        permission) ==
-//                        PackageManager.PERMISSION_GRANTED;
-//
-//        if (!permissionAccessApproved) {
-//            ActivityCompat.requestPermissions(this, new String[]{
-//                    permission
-//            }, 0);
-//        }
-//        return permissionAccessApproved;
-//    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -341,6 +334,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             }
 
         }
+    }
+
+    private boolean checkPermission(String permission) {
+        boolean permissionAccessApproved =
+                ActivityCompat.checkSelfPermission(this,
+                        permission) ==
+                        PackageManager.PERMISSION_GRANTED;
+
+        if (!permissionAccessApproved) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    permission
+            }, 0);
+        }
+        return permissionAccessApproved;
     }
 
     @Override

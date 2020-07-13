@@ -3,10 +3,10 @@ package com.wrlus.fridahooker.agent;
 import android.os.Build;
 import android.util.Log;
 
-import com.wrlus.fridahooker.util.Config;
+import com.wrlus.fridahooker.config.Config;
 import com.wrlus.fridahooker.util.DeviceHelper;
 import com.wrlus.fridahooker.util.LogUtil;
-import com.wrlus.fridahooker.util.NativeRootShell;
+import com.wrlus.fridahooker.agent.shell.NativeRootShell;
 
 import org.tukaani.xz.XZInputStream;
 
