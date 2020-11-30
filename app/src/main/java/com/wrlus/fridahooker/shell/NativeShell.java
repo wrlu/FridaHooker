@@ -1,6 +1,6 @@
-package com.wrlus.fridahooker.agent.shell;
+package com.wrlus.fridahooker.shell;
 
-public class NativeRootShell {
+public class NativeShell {
 
     static {
         System.loadLibrary("fridahooker");

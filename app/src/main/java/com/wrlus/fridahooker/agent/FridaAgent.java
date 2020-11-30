@@ -6,7 +6,7 @@ import android.util.Log;
 import com.wrlus.fridahooker.config.Config;
 import com.wrlus.fridahooker.util.DeviceHelper;
 import com.wrlus.fridahooker.util.LogUtil;
-import com.wrlus.fridahooker.agent.shell.NativeRootShell;
+import com.wrlus.fridahooker.shell.NativeShell;
 
 import org.tukaani.xz.XZInputStream;
 
@@ -55,7 +55,7 @@ public class FridaAgent {
         };
         LogUtil.i(TAG, installPath);
         for (String cmd : cmds) {
-            int code = NativeRootShell.execute(cmd);
+            int code = NativeShell.execute(cmd);
             LogUtil.d(TAG, "installFrida `"+cmd+"` command exit with code "+code);
             if (0 != code) {
                 return false;
@@ -68,7 +68,7 @@ public class FridaAgent {
         if (!isSupported || isInstalled) {
             return false;
         }
-        int code = NativeRootShell.execute("rm -rf " + installPath);
+        int code = NativeShell.execute("rm -rf " + installPath);
         LogUtil.d(TAG, "removeFrida exit with code "+code);
         return 0 == code;
     }
@@ -82,7 +82,7 @@ public class FridaAgent {
                 "su -c " + installPath + File.separator + "frida-server  &",
         };
         for (String cmd : cmds) {
-            int code = NativeRootShell.execute(cmd);
+            int code = NativeShell.execute(cmd);
             LogUtil.d(TAG, "startFrida `"+cmd+"` command exit with code "+code);
             if (0 != code) {
                 return false;
@@ -99,7 +99,7 @@ public class FridaAgent {
                 "su -c kill -9 $(su -c pidof frida-server) &",
         };
         for (String cmd : cmds) {
-            int code = NativeRootShell.execute(cmd);
+            int code = NativeShell.execute(cmd);
             LogUtil.d(TAG, "stopFrida `"+cmd+"` command exit with code "+code);
             if (0 != code) {
                 return false;
@@ -158,7 +158,7 @@ public class FridaAgent {
         if (!isSupported) {
             return false;
         }
-        int code = NativeRootShell.execute("ls " + installPath + File.separator + "frida-server");
+        int code = NativeShell.execute("ls " + installPath + File.separator + "frida-server");
         LogUtil.d(TAG, "checkInstallation exit with code "+code);
         return 0 == code;
     }
